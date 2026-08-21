@@ -1,0 +1,132 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* ========== THÈME CLAIR (par défaut, appliqué quand .dark n'est PAS présent sur <html>) ========== */
+:root {
+  --radius: 0.75rem;
+
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+
+  /* Le violet de marque reste identique dans les deux thèmes, seul le fond change */
+  --primary: oklch(0.62 0.19 280);
+  --primary-foreground: oklch(0.98 0.005 285);
+
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.98 0.005 285);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.62 0.19 280);
+
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.62 0.19 280);
+  --sidebar-primary-foreground: oklch(0.98 0.005 285);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.62 0.19 280);
+}
+
+/* ========== THÈME SOMBRE (appliqué quand la classe .dark est présente sur <html>) ========== */
+.dark {
+  --background: oklch(0.08 0.005 285);
+  --foreground: oklch(0.95 0.005 285);
+  --card: oklch(0.12 0.005 285);
+  --card-foreground: oklch(0.95 0.005 285);
+  --popover: oklch(0.12 0.005 285);
+  --popover-foreground: oklch(0.95 0.005 285);
+
+  --primary: oklch(0.62 0.19 280);
+  --primary-foreground: oklch(0.98 0.005 285);
+
+  --secondary: oklch(0.15 0.005 285);
+  --secondary-foreground: oklch(0.95 0.005 285);
+  --muted: oklch(0.15 0.005 285);
+  --muted-foreground: oklch(0.65 0.005 285);
+  --accent: oklch(0.18 0.005 285);
+  --accent-foreground: oklch(0.95 0.005 285);
+  --destructive: oklch(0.6 0.2 25);
+  --destructive-foreground: oklch(0.98 0.005 285);
+  --border: oklch(0.2 0.005 285);
+  --input: oklch(0.2 0.005 285);
+  --ring: oklch(0.62 0.19 280);
+
+  --sidebar: oklch(0.1 0.005 285);
+  --sidebar-foreground: oklch(0.95 0.005 285);
+  --sidebar-primary: oklch(0.62 0.19 280);
+  --sidebar-primary-foreground: oklch(0.98 0.005 285);
+  --sidebar-accent: oklch(0.15 0.005 285);
+  --sidebar-accent-foreground: oklch(0.95 0.005 285);
+  --sidebar-border: oklch(0.2 0.005 285);
+  --sidebar-ring: oklch(0.62 0.19 280);
+}
+
+/* Couleurs de catégories d'outils, identiques dans les deux thèmes */
+@theme {
+  --color-dev: #6366f1;
+  --color-sec: #ef4444;
+  --color-txt: #f59e0b;
+  --color-gen: #10b981;
+  --color-web: #06b6d4;
+  --color-des: #ec4899;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
