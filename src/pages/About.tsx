@@ -48,7 +48,7 @@ export default function About() {
 
             <div className="flex items-center gap-5">
               <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-border bg-background shadow-sm">
-                <Logo className="h-11 w-11" />
+                <img src="./assets/branding/devdesk-icon.png" alt="DevDesk" className="h-11 w-11" />
               </div>
 
               <div>

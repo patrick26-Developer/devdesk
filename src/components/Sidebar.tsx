@@ -3,7 +3,6 @@ import { cn } from '@/lib/utils';
 import { tools } from '@/tools';
 import { Star, Home, Search, Settings, Info } from 'lucide-react';
 import { useFavorites } from '@/hooks/useFavorites';
-import Logo from '@/components/Logo';
 
 interface SidebarProps {
   activeToolId: string;
@@ -89,7 +88,7 @@ export default function Sidebar({
               shadow-sm
             "
           >
-            <Logo className="h-7 w-7" />
+            <img src="./assets/branding/devdesk-icon.png" alt="DevDesk" className="h-7 w-7" />
           </div>
 
           {/* Brand */}
