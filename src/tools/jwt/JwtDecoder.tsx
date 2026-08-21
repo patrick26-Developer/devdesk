@@ -1,97 +1,222 @@
-// useMemo : redécode le JWT uniquement quand le token saisi change
 import { useMemo, useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  AlertCircle,
+  CheckCircle2,
+  Code2,
+  ShieldCheck,
+} from 'lucide-react';
 
-// Décode une chaîne Base64URL (variante du Base64 utilisée par les JWT : - au lieu de +, _ au lieu de /, pas de padding =)
+// Décode une chaîne Base64URL utilisée par les JWT.
 function base64UrlDecode(str: string): string {
-  // Remplace les caractères spécifiques à Base64URL par ceux du Base64 standard
   let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
-  // Réajoute le padding '=' manquant, requis par atob pour un décodage correct
+
   while (base64.length % 4 !== 0) {
     base64 += '=';
   }
-  // decodeURIComponent + escape/atob : gère correctement les caractères UTF-8 (accents, emojis dans les claims)
+
   return decodeURIComponent(escape(atob(base64)));
 }
 
 export default function JwtDecoder() {
-  // Le token JWT brut collé par l'utilisateur (format: header.payload.signature)
   const [token, setToken] = useState('');
 
-  // Décode le header et le payload à chaque changement de token
   const decoded = useMemo(() => {
     if (!token.trim()) return null;
 
-    // Un JWT valide a exactement 3 parties séparées par des points
     const parts = token.trim().split('.');
+
     if (parts.length !== 3) {
-      return { error: 'Format invalide : un JWT doit contenir 3 parties séparées par des points' };
+      return {
+        error:
+          'Format invalide : un JWT doit contenir 3 parties séparées par des points',
+      };
     }
 
     try {
-      // Décode et parse le header (algorithme, type de token)
       const header = JSON.parse(base64UrlDecode(parts[0]));
-      // Décode et parse le payload (claims : sub, exp, iat, données custom...)
       const payload = JSON.parse(base64UrlDecode(parts[1]));
 
-      // Vérifie si le token est expiré, si le claim "exp" (timestamp Unix en secondes) est présent
-      const isExpired = payload.exp ? Date.now() / 1000 > payload.exp : null;
+      const isExpired = payload.exp
+        ? Date.now() / 1000 > payload.exp
+        : null;
 
-      return { header, payload, isExpired, error: null };
+      return {
+        header,
+        payload,
+        isExpired,
+        error: null,
+      };
     } catch {
-      // Si le décodage Base64 ou le parsing JSON échoue, le token est mal formé
-      return { error: 'Impossible de décoder ce token (Base64 ou JSON invalide)' };
+      return {
+        error: 'Impossible de décoder ce token (Base64 ou JSON invalide)',
+      };
     }
   }, [token]);
 
   return (
-    <div className="flex flex-col h-full p-6 gap-4">
-      <h2 className="text-lg font-semibold">JWT Decoder</h2>
-      <p className="text-xs text-muted-foreground">
-        Décodage uniquement, en local — aucune vérification de signature, aucune donnée envoyée nulle part.
-      </p>
+    <div className="flex h-full flex-col gap-6 p-6 xl:p-8">
+      {/* =========================================================
+          HEADER
+      ========================================================= */}
+      <div className="flex items-start gap-4">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-red-500/15 bg-red-500/10 text-red-500">
+          <ShieldCheck className="h-5 w-5" />
+        </div>
 
-      {/* Zone de collage du token */}
-      <Textarea
-        value={token}
-        onChange={(e) => setToken(e.target.value)}
-        placeholder="Colle ton token JWT ici (eyJhbGciOiJ...)"
-        className="font-mono text-sm resize-none h-24"
-      />
+        <div>
+          <h2 className="text-lg font-semibold tracking-tight">
+            JWT Decoder
+          </h2>
 
-      {/* Affiche l'erreur si le token est mal formé */}
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            Analysez localement le header et le payload d'un token JWT.
+          </p>
+        </div>
+      </div>
+
+      {/* =========================================================
+          INFORMATIONS DE SÉCURITÉ
+      ========================================================= */}
+      <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-3 text-xs text-muted-foreground">
+        <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-500" />
+
+        <span>
+          Décodage uniquement en local — aucune vérification de signature
+          et aucune donnée envoyée à un serveur.
+        </span>
+      </div>
+
+      {/* =========================================================
+          TOKEN
+      ========================================================= */}
+      <section className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-medium text-foreground">
+            Token JWT
+          </label>
+
+          <span className="font-mono text-[10px] text-muted-foreground">
+            HEADER.PAYLOAD.SIGNATURE
+          </span>
+        </div>
+
+        <Textarea
+          value={token}
+          onChange={(e) => setToken(e.target.value)}
+          placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          className="min-h-[110px] resize-none rounded-xl border-border bg-card font-mono text-xs leading-5"
+        />
+      </section>
+
+      {/* =========================================================
+          ERREUR
+      ========================================================= */}
       {decoded?.error && (
-        <p className="text-sm text-destructive">{decoded.error}</p>
+        <div className="flex items-start gap-3 rounded-xl border border-destructive/20 bg-destructive/5 p-4">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+
+          <div>
+            <p className="text-xs font-semibold text-destructive">
+              Token invalide
+            </p>
+
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+              {decoded.error}
+            </p>
+          </div>
+        </div>
       )}
 
-      {/* Affiche header + payload si le décodage a réussi */}
+      {/* =========================================================
+          RÉSULTATS
+      ========================================================= */}
       {decoded && !decoded.error && (
-        <div className="grid grid-cols-2 gap-4 flex-1 min-h-0">
-          <div className="flex flex-col gap-2">
-            <label className="text-sm text-muted-foreground">Header</label>
-            <pre className="flex-1 overflow-auto font-mono text-xs bg-muted/30 rounded-md p-3">
+        <div className="grid min-h-0 flex-1 grid-cols-1 gap-5 lg:grid-cols-2">
+          {/* HEADER JWT */}
+          <section className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-card">
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
+              <div className="flex items-center gap-2">
+                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-sky-500/10 text-sky-500">
+                  <Code2 className="h-3.5 w-3.5" />
+                </div>
+
+                <div>
+                  <h3 className="text-xs font-semibold">Header</h3>
+                  <p className="text-[10px] text-muted-foreground">
+                    Métadonnées du token
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <pre className="min-h-0 flex-1 overflow-auto bg-muted/20 p-4 font-mono text-xs leading-5">
               {JSON.stringify(decoded.header, null, 2)}
             </pre>
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-sm text-muted-foreground flex items-center gap-2">
-              Payload
-              {/* Badge d'expiration, coloré selon le statut */}
+          </section>
+
+          {/* PAYLOAD JWT */}
+          <section className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-card">
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
+              <div className="flex items-center gap-2">
+                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-violet-500/10 text-violet-500">
+                  <Code2 className="h-3.5 w-3.5" />
+                </div>
+
+                <div>
+                  <h3 className="text-xs font-semibold">Payload</h3>
+                  <p className="text-[10px] text-muted-foreground">
+                    Claims et données du token
+                  </p>
+                </div>
+              </div>
+
               {decoded.isExpired !== null && (
-                <span
-                  className={
+                <div
+                  className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-medium ${
                     decoded.isExpired
-                      ? 'text-destructive text-xs font-medium'
-                      : 'text-green-600 text-xs font-medium'
-                  }
+                      ? 'border-destructive/20 bg-destructive/5 text-destructive'
+                      : 'border-emerald-500/20 bg-emerald-500/5 text-emerald-600'
+                  }`}
                 >
-                  {decoded.isExpired ? '● Expiré' : '● Valide (non expiré)'}
-                </span>
+                  {decoded.isExpired ? (
+                    <AlertCircle className="h-3 w-3" />
+                  ) : (
+                    <CheckCircle2 className="h-3 w-3" />
+                  )}
+
+                  {decoded.isExpired
+                    ? 'Token expiré'
+                    : 'Token non expiré'}
+                </div>
               )}
-            </label>
-            <pre className="flex-1 overflow-auto font-mono text-xs bg-muted/30 rounded-md p-3">
+            </div>
+
+            <pre className="min-h-0 flex-1 overflow-auto bg-muted/20 p-4 font-mono text-xs leading-5">
               {JSON.stringify(decoded.payload, null, 2)}
             </pre>
+          </section>
+        </div>
+      )}
+
+      {/* =========================================================
+          EMPTY STATE
+      ========================================================= */}
+      {!token.trim() && (
+        <div className="flex flex-1 items-center justify-center rounded-xl border border-dashed border-border bg-muted/10">
+          <div className="max-w-sm text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-red-500/15 bg-red-500/10 text-red-500">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+
+            <h3 className="mt-4 text-sm font-semibold">
+              Aucun token à analyser
+            </h3>
+
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+              Collez un token JWT dans la zone ci-dessus pour afficher
+              automatiquement son header et son payload.
+            </p>
           </div>
         </div>
       )}

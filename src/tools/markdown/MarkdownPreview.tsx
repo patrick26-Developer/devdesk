@@ -1,46 +1,100 @@
-// useMemo : recalcule le HTML rendu uniquement quand le texte source change
 import { useMemo, useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
-// marked : parseur Markdown -> HTML
 import { marked } from 'marked';
-// DOMPurify : nettoie le HTML généré pour retirer tout script/attribut dangereux avant de l'injecter dans le DOM
 import DOMPurify from 'dompurify';
+import {
+  Eye,
+  FileCode2,
+  ShieldCheck,
+} from 'lucide-react';
 
 export default function MarkdownPreview() {
-  // Le texte Markdown brut saisi par l'utilisateur
-  const [markdown, setMarkdown] = useState('# Titre\n\nTape du **Markdown** ici.');
+  const [markdown, setMarkdown] = useState(
+    '# Titre\n\nTape du **Markdown** ici.',
+  );
 
-  // Convertit le Markdown en HTML sûr, recalculé uniquement quand le texte change
   const safeHtml = useMemo(() => {
-    // marked.parse peut renvoyer une Promise selon la config ; en usage synchrone standard elle renvoie une string
-    const rawHtml = marked.parse(markdown, { async: false }) as string;
-    // DOMPurify.sanitize retire tout <script>, onclick=, etc. avant qu'on injecte ce HTML dans le DOM réel
+    const rawHtml = marked.parse(markdown, {
+      async: false,
+    }) as string;
+
     return DOMPurify.sanitize(rawHtml);
   }, [markdown]);
 
   return (
-    <div className="flex flex-col h-full p-6 gap-4">
-      <h2 className="text-lg font-semibold">Markdown Preview</h2>
+    <div className="flex h-full flex-col gap-6 p-6 xl:p-8">
+      {/* En-tête */}
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-blue-500/15 bg-blue-500/10 text-blue-500">
+          <FileCode2 className="h-5 w-5" />
+        </div>
 
-      {/* Deux colonnes : édition à gauche, rendu à droite */}
-      <div className="grid grid-cols-2 gap-4 flex-1 min-h-0">
-        <div className="flex flex-col gap-2">
-          <label className="text-sm text-muted-foreground">Markdown</label>
+        <div>
+          <h2 className="text-lg font-semibold tracking-tight">
+            Markdown Preview
+          </h2>
+
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Écrivez du Markdown et visualisez instantanément son rendu.
+          </p>
+        </div>
+      </div>
+
+      {/* Sécurité */}
+      <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+        <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
+        Aperçu nettoyé avec DOMPurify avant injection HTML.
+      </div>
+
+      {/* Éditeur */}
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-2">
+        {/* Markdown */}
+        <section className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-card">
+          <div className="flex items-center gap-2 border-b border-border px-4 py-3">
+            <FileCode2 className="h-4 w-4 text-blue-500" />
+
+            <div>
+              <h3 className="text-sm font-medium">
+                Markdown
+              </h3>
+
+              <p className="text-[11px] text-muted-foreground">
+                Éditeur
+              </p>
+            </div>
+          </div>
+
           <Textarea
             value={markdown}
             onChange={(e) => setMarkdown(e.target.value)}
-            className="flex-1 font-mono text-sm resize-none"
+            className="min-h-0 flex-1 resize-none rounded-none border-0 bg-muted/10 p-4 font-mono text-sm leading-6 focus-visible:ring-0"
+            placeholder="# Votre titre..."
           />
-        </div>
-        <div className="flex flex-col gap-2">
-          <label className="text-sm text-muted-foreground">Aperçu</label>
-          {/* dangerouslySetInnerHTML : nécessaire pour injecter du HTML généré dynamiquement.
-              C'est sûr ici UNIQUEMENT parce que le HTML a été nettoyé par DOMPurify juste avant. */}
+        </section>
+
+        {/* Preview */}
+        <section className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-card">
+          <div className="flex items-center gap-2 border-b border-border px-4 py-3">
+            <Eye className="h-4 w-4 text-emerald-500" />
+
+            <div>
+              <h3 className="text-sm font-medium">
+                Aperçu
+              </h3>
+
+              <p className="text-[11px] text-muted-foreground">
+                Rendu en temps réel
+              </p>
+            </div>
+          </div>
+
           <div
-            className="flex-1 overflow-auto border rounded-md p-4 prose prose-sm max-w-none dark:prose-invert"
-            dangerouslySetInnerHTML={{ __html: safeHtml }}
+            className="prose prose-sm dark:prose-invert min-h-0 max-w-none flex-1 overflow-auto bg-background p-6"
+            dangerouslySetInnerHTML={{
+              __html: safeHtml,
+            }}
           />
-        </div>
+        </section>
       </div>
     </div>
   );

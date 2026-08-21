@@ -1,91 +1,177 @@
-// useState : état local pour le timestamp saisi et la date lisible saisie
-// useMemo : recalcule les conversions uniquement quand l'entrée change
 import { useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import {
+  Clock,
+  ArrowDown,
+  ArrowUp,
+  RotateCcw,
+} from 'lucide-react';
 
 export default function TimestampConverter() {
-  // Timestamp Unix saisi par l'utilisateur (en chaîne, car un champ input renvoie toujours du texte)
   const [timestampInput, setTimestampInput] = useState('');
-  // Champ date/heure lisible, au format compatible avec <input type="datetime-local">
   const [dateInput, setDateInput] = useState('');
 
-  // Convertit le timestamp saisi en informations de date lisibles (plusieurs formats utiles)
   const fromTimestamp = useMemo(() => {
-    // Si le champ est vide ou non-numérique, on ne calcule rien
-    if (!timestampInput || isNaN(Number(timestampInput))) return null;
+    if (
+      !timestampInput ||
+      isNaN(Number(timestampInput))
+    ) {
+      return null;
+    }
 
     const num = Number(timestampInput);
-    // Heuristique simple : si le nombre a plus de 10 chiffres, c'est probablement des millisecondes, pas des secondes
-    const ms = timestampInput.length > 10 ? num : num * 1000;
+    const ms =
+      timestampInput.length > 10
+        ? num
+        : num * 1000;
+
     const date = new Date(ms);
 
-    // Vérifie que la date obtenue est valide (évite d'afficher "Invalid Date")
     if (isNaN(date.getTime())) return null;
 
     return {
-      iso: date.toISOString(), // format ISO 8601 standard, ex: 2026-08-20T10:00:00.000Z
-      local: date.toLocaleString(), // format lisible selon la locale du système
-      utc: date.toUTCString(), // format UTC lisible
+      iso: date.toISOString(),
+      local: date.toLocaleString(),
+      utc: date.toUTCString(),
     };
   }, [timestampInput]);
 
-  // Convertit la date lisible saisie en timestamp Unix (secondes)
   const fromDate = useMemo(() => {
     if (!dateInput) return null;
+
     const date = new Date(dateInput);
+
     if (isNaN(date.getTime())) return null;
+
     return Math.floor(date.getTime() / 1000);
   }, [dateInput]);
 
-  // Remplit le champ timestamp avec l'instant présent, en un clic
   const useNow = () => {
-    setTimestampInput(String(Math.floor(Date.now() / 1000)));
+    setTimestampInput(
+      String(Math.floor(Date.now() / 1000))
+    );
   };
 
   return (
-    <div className="flex flex-col h-full p-6 gap-6 max-w-xl">
-      <h2 className="text-lg font-semibold">Timestamp Converter</h2>
-
-      {/* Bloc 1 : timestamp -> date lisible */}
-      <div className="flex flex-col gap-2">
-        <label className="text-sm text-muted-foreground">Timestamp Unix (secondes ou millisecondes)</label>
-        <div className="flex gap-2">
-          <Input
-            value={timestampInput}
-            onChange={(e) => setTimestampInput(e.target.value)}
-            placeholder="1755000000"
-            className="font-mono"
-          />
-          <Button variant="secondary" onClick={useNow}>Maintenant</Button>
+    <div className="flex h-full flex-col gap-6 p-6">
+      {/* Header */}
+      <div className="flex items-start gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-500/15 bg-amber-500/10 text-amber-500">
+          <Clock className="h-5 w-5" />
         </div>
 
-        {/* N'affiche les résultats que si la conversion a réussi */}
-        {fromTimestamp && (
-          <div className="text-sm font-mono bg-muted/30 rounded-md p-3 space-y-1 mt-1">
-            <p>ISO : {fromTimestamp.iso}</p>
-            <p>Local : {fromTimestamp.local}</p>
-            <p>UTC : {fromTimestamp.utc}</p>
-          </div>
-        )}
+        <div>
+          <h2 className="text-lg font-semibold">
+            Timestamp Converter
+          </h2>
+
+          <p className="mt-1 text-xs text-muted-foreground">
+            Convertis des timestamps Unix en dates et inversement.
+          </p>
+        </div>
       </div>
 
-      {/* Bloc 2 : date lisible -> timestamp */}
-      <div className="flex flex-col gap-2">
-        <label className="text-sm text-muted-foreground">Date et heure</label>
-        {/* input natif HTML datetime-local : pas besoin de composant shadcn dédié, le navigateur gère le picker */}
-        <input
-          type="datetime-local"
-          value={dateInput}
-          onChange={(e) => setDateInput(e.target.value)}
-          className="border rounded-md px-3 py-2 text-sm bg-background"
-        />
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {/* Timestamp -> Date */}
+        <section className="rounded-xl border border-border bg-card p-4">
+          <div className="mb-4 flex items-center gap-2">
+            <ArrowDown className="h-4 w-4 text-amber-500" />
 
-        {fromDate !== null && (
-          <p className="text-sm font-mono bg-muted/30 rounded-md p-3 mt-1">
-            Timestamp : {fromDate}
-          </p>
-        )}
+            <div>
+              <p className="text-xs font-semibold">
+                Timestamp → Date
+              </p>
+
+              <p className="text-[11px] text-muted-foreground">
+                Secondes ou millisecondes
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            <Input
+              value={timestampInput}
+              onChange={(e) =>
+                setTimestampInput(e.target.value)
+              }
+              placeholder="1755000000"
+              className="font-mono"
+            />
+
+            <Button
+              variant="secondary"
+              onClick={useNow}
+              className="gap-2"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              Maintenant
+            </Button>
+          </div>
+
+          {fromTimestamp && (
+            <div className="mt-4 space-y-2 rounded-lg bg-muted/30 p-3 font-mono text-xs">
+              <p>
+                <span className="text-muted-foreground">
+                  ISO :
+                </span>{' '}
+                {fromTimestamp.iso}
+              </p>
+
+              <p>
+                <span className="text-muted-foreground">
+                  Local :
+                </span>{' '}
+                {fromTimestamp.local}
+              </p>
+
+              <p>
+                <span className="text-muted-foreground">
+                  UTC :
+                </span>{' '}
+                {fromTimestamp.utc}
+              </p>
+            </div>
+          )}
+        </section>
+
+        {/* Date -> Timestamp */}
+        <section className="rounded-xl border border-border bg-card p-4">
+          <div className="mb-4 flex items-center gap-2">
+            <ArrowUp className="h-4 w-4 text-emerald-500" />
+
+            <div>
+              <p className="text-xs font-semibold">
+                Date → Timestamp
+              </p>
+
+              <p className="text-[11px] text-muted-foreground">
+                Date et heure locales
+              </p>
+            </div>
+          </div>
+
+          <input
+            type="datetime-local"
+            value={dateInput}
+            onChange={(e) =>
+              setDateInput(e.target.value)
+            }
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          />
+
+          {fromDate !== null && (
+            <div className="mt-4 rounded-lg bg-muted/30 p-3">
+              <p className="text-xs text-muted-foreground">
+                Timestamp Unix
+              </p>
+
+              <p className="mt-1 font-mono text-sm font-medium">
+                {fromDate}
+              </p>
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );

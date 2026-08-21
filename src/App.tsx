@@ -3,6 +3,7 @@ import Sidebar from '@/components/Sidebar';
 import Home from '@/pages/Home';
 import Settings from '@/pages/Settings';
 import About from '@/pages/About';
+import Guide from '@/pages/Guide';
 import ThemeToggle from '@/components/ThemeToggle';
 import { useTheme } from '@/hooks/useTheme';
 import { tools } from '@/tools';
@@ -26,26 +27,28 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [toggleTheme]);
 
-  // undefined si activeToolId est 'home', 'settings' ou 'about' (ids spéciaux hors du registre d'outils)
+  // undefined si activeToolId est un id spécial hors du registre d'outils
   const activeTool = tools.find((tool) => tool.id === activeToolId);
   const ActiveComponent = activeTool?.component;
 
-  // Détermine le titre et le sous-titre affichés dans l'en-tête, selon la page active
+  // Détermine le titre et le sous-titre affichés dans l'en-tête
   const headerInfo =
     activeToolId === 'settings'
       ? { title: 'Paramètres', subtitle: 'Préférences locales.' }
       : activeToolId === 'about'
         ? { title: 'À propos', subtitle: 'Informations sur DevDesk.' }
-        : activeTool
-          ? { title: activeTool.name, subtitle: 'Utilitaire développeur professionnel.' }
-          : { title: 'Accueil', subtitle: 'Vue d’ensemble de vos outils.' };
+        : activeToolId === 'guide'
+          ? { title: "Guide d'utilisation", subtitle: 'Comment utiliser chaque outil.' }
+          : activeTool
+            ? { title: activeTool.name, subtitle: 'Utilitaire développeur professionnel.' }
+            : { title: 'Accueil', subtitle: "Vue d'ensemble de vos outils." };
 
   return (
     <div className="flex h-screen overflow-hidden bg-background text-foreground">
       <Sidebar activeToolId={activeToolId} onSelectTool={setActiveToolId} />
 
       <main className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex items-center justify-between border-b border-border px-8 py-4">
+        <header className="flex items-center justify-between border-b border-border bg-card/50 backdrop-blur-sm px-8 py-4">
           <div>
             <h2 className="text-lg font-semibold">{headerInfo.title}</h2>
             <p className="text-sm text-muted-foreground">{headerInfo.subtitle}</p>
@@ -56,7 +59,13 @@ export default function App() {
         <div className="flex-1 overflow-auto">
           {activeToolId === 'settings' && <Settings />}
           {activeToolId === 'about' && <About />}
-          {activeToolId === 'home' && <Home onSelectTool={setActiveToolId} />}
+          {activeToolId === 'guide' && <Guide />}
+          {activeToolId === 'home' && (
+            <Home
+              onSelectTool={setActiveToolId}
+              onOpenGuide={() => setActiveToolId('guide')}
+            />
+          )}
           {activeTool && ActiveComponent && <ActiveComponent />}
         </div>
       </main>

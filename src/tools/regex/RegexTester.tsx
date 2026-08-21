@@ -1,120 +1,176 @@
-// useState : gère l'état local du composant (pattern regex, texte testé, flags, résultat)
-// useMemo : recalcule le résultat uniquement quand une dépendance change (évite de re-tester à chaque frappe inutilement)
 import { useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Regex, SearchCheck } from 'lucide-react';
 
 export default function RegexTester() {
-  // Le pattern regex tapé par l'utilisateur, sans les délimiteurs / /
   const [pattern, setPattern] = useState('');
-  // Les flags regex (g, i, m...) tapés par l'utilisateur
   const [flags, setFlags] = useState('g');
-  // Le texte dans lequel on cherche des correspondances
   const [text, setText] = useState('');
 
-  // useMemo recalcule "result" uniquement quand pattern, flags ou text changent.
-  // On regroupe ici la logique de matching ET la gestion d'erreur (regex invalide).
   const result = useMemo(() => {
-    // Si le pattern est vide, inutile de tester quoi que ce soit
-    if (!pattern) return { matches: [], error: null };
+    if (!pattern) {
+      return { matches: [], error: null };
+    }
 
     try {
-      // Construit dynamiquement l'objet RegExp à partir du pattern et des flags saisis
       const regex = new RegExp(pattern, flags);
-      // matchAll renvoie un itérateur de tous les matches (nécessite le flag 'g' pour fonctionner)
-      // Array.from le convertit en tableau exploitable par React
+
       const matches = flags.includes('g')
         ? Array.from(text.matchAll(regex))
-        : // Sans le flag global, on ne peut avoir qu'un seul match ; on le met quand même dans un tableau
-          (text.match(regex) ? [text.match(regex)!] : []);
-      return { matches, error: null };
+        : text.match(regex)
+          ? [text.match(regex)!]
+          : [];
+
+      return {
+        matches,
+        error: null,
+      };
     } catch (e) {
-      // Si le pattern est syntaxiquement invalide (ex: parenthèse non fermée), on capture l'erreur au lieu de crasher
-      return { matches: [], error: (e as Error).message };
+      return {
+        matches: [],
+        error: (e as Error).message,
+      };
     }
   }, [pattern, flags, text]);
 
-  // Fonction qui découpe le texte en segments pour surligner les parties matchées.
-  // On construit un tableau de morceaux : { text, isMatch } dans l'ordre du texte original.
   const highlightedSegments = useMemo(() => {
-    if (result.matches.length === 0 || !text) return [{ text, isMatch: false }];
+    if (result.matches.length === 0 || !text) {
+      return [{ text, isMatch: false }];
+    }
 
-    const segments: { text: string; isMatch: boolean }[] = [];
+    const segments: {
+      text: string;
+      isMatch: boolean;
+    }[] = [];
+
     let lastIndex = 0;
 
-    // Parcourt chaque match trouvé pour découper le texte autour
     for (const match of result.matches) {
       const index = match.index ?? 0;
-      // Ajoute le texte non-matché avant ce match (s'il y en a)
+
       if (index > lastIndex) {
-        segments.push({ text: text.slice(lastIndex, index), isMatch: false });
+        segments.push({
+          text: text.slice(lastIndex, index),
+          isMatch: false,
+        });
       }
-      // Ajoute le match lui-même, marqué pour être surligné
-      segments.push({ text: match[0], isMatch: true });
+
+      segments.push({
+        text: match[0],
+        isMatch: true,
+      });
+
       lastIndex = index + match[0].length;
     }
-    // Ajoute le reste du texte après le dernier match
+
     if (lastIndex < text.length) {
-      segments.push({ text: text.slice(lastIndex), isMatch: false });
+      segments.push({
+        text: text.slice(lastIndex),
+        isMatch: false,
+      });
     }
 
     return segments;
   }, [result.matches, text]);
 
   return (
-    <div className="flex flex-col h-full p-6 gap-4">
-      <h2 className="text-lg font-semibold">Regex Tester</h2>
+    <div className="flex h-full flex-col gap-6 p-6">
+      {/* Header */}
+      <div className="flex items-start gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-pink-500/15 bg-pink-500/10 text-pink-500">
+          <Regex className="h-5 w-5" />
+        </div>
 
-      {/* Ligne pattern + flags côte à côte */}
-      <div className="flex gap-2 items-center font-mono">
-        <span className="text-muted-foreground">/</span>
-        <Input
-          value={pattern}
-          onChange={(e) => setPattern(e.target.value)}
-          placeholder="votre pattern regex"
-          className="font-mono"
-        />
-        <span className="text-muted-foreground">/</span>
-        <Input
-          value={flags}
-          onChange={(e) => setFlags(e.target.value)}
-          placeholder="flags"
-          className="w-20 font-mono"
-        />
+        <div>
+          <h2 className="text-lg font-semibold">
+            Regex Tester
+          </h2>
+
+          <p className="mt-1 text-xs text-muted-foreground">
+            Teste et visualise tes expressions régulières en temps réel.
+          </p>
+        </div>
       </div>
 
-      {/* Affiche l'erreur de syntaxe regex si le pattern est invalide */}
+      {/* Pattern */}
+      <section className="rounded-xl border border-border bg-card p-4">
+        <label className="mb-2 block text-xs font-medium">
+          Expression régulière
+        </label>
+
+        <div className="flex items-center gap-2 font-mono">
+          <span className="text-muted-foreground">/</span>
+
+          <Input
+            value={pattern}
+            onChange={(e) => setPattern(e.target.value)}
+            placeholder="votre pattern regex"
+            className="font-mono"
+          />
+
+          <span className="text-muted-foreground">/</span>
+
+          <Input
+            value={flags}
+            onChange={(e) => setFlags(e.target.value)}
+            placeholder="gim"
+            className="w-20 font-mono"
+          />
+        </div>
+      </section>
+
       {result.error && (
-        <p className="text-sm text-destructive">Erreur : {result.error}</p>
+        <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-3 text-xs text-destructive">
+          Erreur : {result.error}
+        </div>
       )}
 
-      {/* Zone de texte à tester */}
-      <Textarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder="Colle ton texte à tester ici..."
-        className="flex-1 font-mono text-sm resize-none"
-      />
+      {/* Text */}
+      <section className="flex min-h-0 flex-1 flex-col gap-2">
+        <label className="text-xs font-medium">
+          Texte à tester
+        </label>
 
-      {/* Aperçu avec surlignage des parties matchées */}
-      <div className="border rounded-md p-3 text-sm font-mono whitespace-pre-wrap min-h-24 bg-muted/30">
-        {highlightedSegments.map((seg, i) =>
-          seg.isMatch ? (
-            // Segment matché : fond jaune pour le mettre en évidence
-            <mark key={i} className="bg-yellow-300/60 rounded-sm">
-              {seg.text}
-            </mark>
-          ) : (
-            // Segment normal : affiché tel quel
-            <span key={i}>{seg.text}</span>
-          )
-        )}
-      </div>
+        <Textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Colle ton texte à tester ici..."
+          className="min-h-32 flex-1 resize-none font-mono text-sm"
+        />
+      </section>
 
-      {/* Compteur de résultats */}
-      <p className="text-sm text-muted-foreground">
-        {result.matches.length} correspondance(s) trouvée(s)
-      </p>
+      {/* Result */}
+      <section className="rounded-xl border border-border bg-card overflow-hidden">
+        <div className="flex items-center justify-between border-b border-border px-4 py-3">
+          <div className="flex items-center gap-2">
+            <SearchCheck className="h-4 w-4 text-pink-500" />
+            <span className="text-xs font-semibold">
+              Correspondances
+            </span>
+          </div>
+
+          <span className="text-xs text-muted-foreground">
+            {result.matches.length} résultat
+            {result.matches.length !== 1 ? 's' : ''}
+          </span>
+        </div>
+
+        <div className="min-h-24 bg-muted/20 p-4 font-mono text-sm whitespace-pre-wrap">
+          {highlightedSegments.map((seg, i) =>
+            seg.isMatch ? (
+              <mark
+                key={i}
+                className="rounded bg-pink-500/20 px-0.5 text-pink-600 dark:text-pink-300"
+              >
+                {seg.text}
+              </mark>
+            ) : (
+              <span key={i}>{seg.text}</span>
+            )
+          )}
+        </div>
+      </section>
     </div>
   );
 }
