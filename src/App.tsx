@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import Sidebar from '@/components/Sidebar';
+import Sidebar, { SidebarToggle } from '@/components/Sidebar';
 import Home from '@/pages/Home';
 import Settings from '@/pages/Settings';
 import About from '@/pages/About';
@@ -10,6 +10,8 @@ import { tools } from '@/tools';
 
 export default function App() {
   const [activeToolId, setActiveToolId] = useState('home');
+  // Contrôle l'affichage de la sidebar en mode fenêtre étroite (drawer). Sans effet sur grand écran (toujours visible).
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const { toggleTheme } = useTheme();
 
   useEffect(() => {
@@ -27,11 +29,9 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [toggleTheme]);
 
-  // undefined si activeToolId est un id spécial hors du registre d'outils
   const activeTool = tools.find((tool) => tool.id === activeToolId);
   const ActiveComponent = activeTool?.component;
 
-  // Détermine le titre et le sous-titre affichés dans l'en-tête
   const headerInfo =
     activeToolId === 'settings'
       ? { title: 'Paramètres', subtitle: 'Préférences locales.' }
@@ -41,17 +41,27 @@ export default function App() {
           ? { title: "Guide d'utilisation", subtitle: 'Comment utiliser chaque outil.' }
           : activeTool
             ? { title: activeTool.name, subtitle: 'Utilitaire développeur professionnel.' }
-            : { title: 'Accueil', subtitle: "Vue d'ensemble de vos outils." };
+            : { title: 'Accueil', subtitle: 'Vue d’ensemble de vos outils.' };
 
   return (
     <div className="flex h-screen overflow-hidden bg-background text-foreground">
-      <Sidebar activeToolId={activeToolId} onSelectTool={setActiveToolId} />
+      <Sidebar
+        activeToolId={activeToolId}
+        onSelectTool={setActiveToolId}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
-      <main className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex items-center justify-between border-b border-border bg-card/50 backdrop-blur-sm px-8 py-4">
-          <div>
-            <h2 className="text-lg font-semibold">{headerInfo.title}</h2>
-            <p className="text-sm text-muted-foreground">{headerInfo.subtitle}</p>
+      <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <header className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-8 sm:py-4">
+          <div className="flex min-w-0 items-center gap-2">
+            {/* Bouton hamburger : visible uniquement sous md (voir classe md:hidden dans SidebarToggle) */}
+            <SidebarToggle onClick={() => setSidebarOpen(true)} />
+            <div className="min-w-0">
+              <h2 className="truncate text-base font-semibold sm:text-lg">{headerInfo.title}</h2>
+              {/* Sous-titre masqué sur très petite largeur pour ne pas encombrer l'en-tête */}
+              <p className="hidden truncate text-sm text-muted-foreground sm:block">{headerInfo.subtitle}</p>
+            </div>
           </div>
           <ThemeToggle />
         </header>
@@ -60,12 +70,7 @@ export default function App() {
           {activeToolId === 'settings' && <Settings />}
           {activeToolId === 'about' && <About />}
           {activeToolId === 'guide' && <Guide />}
-          {activeToolId === 'home' && (
-            <Home
-              onSelectTool={setActiveToolId}
-              onOpenGuide={() => setActiveToolId('guide')}
-            />
-          )}
+          {activeToolId === 'home' && <Home onSelectTool={setActiveToolId} />}
           {activeTool && ActiveComponent && <ActiveComponent />}
         </div>
       </main>

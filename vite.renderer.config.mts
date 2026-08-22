@@ -13,4 +13,7 @@ export default defineConfig({
   // publicDir : le contenu de ce dossier est copié tel quel à la racine du build et servi tel quel en dev.
   // Par défaut Vite cherche un dossier "public", mais le tien s'appelle "assets" — on le précise explicitement.
   publicDir: path.resolve(__dirname, './assets'),
+  // CRITIQUE : force les chemins d'assets générés en relatif ('./xyz.png') plutôt qu'absolu ('/xyz.png').
+  // Sans ça, tout chemin absolu casse une fois le HTML chargé via file:// en production.
+  base: './',
 });

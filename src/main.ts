@@ -107,13 +107,21 @@ ipcMain.handle('app:openDataFolder', async () => {
 
 // Fonction qui crée la fenêtre principale de DevDesk
 const createWindow = () => {
+  // En développement, l'app tourne depuis le dossier du projet (process.cwd() est fiable).
+  // Une fois packagée, les fichiers copiés via extraResource (voir forge.config.ts) se trouvent
+  // dans process.resourcesPath, pas dans process.cwd() — d'où cette distinction explicite.
+  const iconPath = app.isPackaged
+    ? path.join(process.resourcesPath, 'assets', 'branding', 'devdesk-icon.png')
+    : path.join(process.cwd(), 'assets', 'branding', 'devdesk-icon.png');
+
   const mainWindow = new BrowserWindow({
     width: 1440,
     height: 900,
-    minWidth: 1200,
-    minHeight: 720,
+    // Fenêtre redimensionnable jusqu'à une petite largeur, pour permettre de réellement tester le responsive
+    minWidth: 380,
+    minHeight: 600,
     title: 'DevDesk',
-    icon: path.join(process.cwd(), 'assets', 'branding', 'devdesk-icon.png'),
+    icon: iconPath,
     backgroundColor: '#09090B',
     autoHideMenuBar: true,
     webPreferences: {
@@ -123,7 +131,6 @@ const createWindow = () => {
     },
   });
 
-  // Intercepte l'ouverture de nouvelles fenêtres et redirige vers le navigateur système
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith('https://') || url.startsWith('http://')) {
       shell.openExternal(url);
@@ -131,7 +138,6 @@ const createWindow = () => {
     return { action: 'deny' };
   });
 
-  // Charge l'URL de dev ou le fichier buildé
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
     mainWindow.webContents.openDevTools({ mode: 'detach' });

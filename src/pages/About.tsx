@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { tools } from '@/tools';
-import Logo from '@/components/Logo';
+// Import ES du logo réel : garantit un chemin correct en dev ET en production (voir explication plus haut)
+import logoSrc from '../../assets/branding/devdesk-icon.png';
 import {
   ExternalLink,
   ShieldCheck,
@@ -48,7 +49,7 @@ export default function About() {
 
             <div className="flex items-center gap-5">
               <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-border bg-background shadow-sm">
-                <img src="./assets/branding/devdesk-icon.png" alt="DevDesk" className="h-11 w-11" />
+                <img src={logoSrc} alt="DevDesk" className="h-11 w-11" />
               </div>
 
               <div>

@@ -216,7 +216,6 @@ export default function JsonFormatter() {
           rounded-xl
           border border-border
           bg-card
-          shadow-sm
         ">
 
           {/* Editor header */}
@@ -316,7 +315,6 @@ export default function JsonFormatter() {
           rounded-xl
           border border-border
           bg-card
-          shadow-sm
         ">
 
           {/* Editor header */}

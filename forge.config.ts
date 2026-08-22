@@ -11,7 +11,8 @@ const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
     // Chemin RELATIF depuis la racine du projet (pas d'alias @ ici)
-    icon: './assets/branding/devdesk-icon',
+    icon: './assets/branding/devdesk-icon.png',
+    extraResource: ['./assets'],
   },
   rebuildConfig: {},
   makers: [
