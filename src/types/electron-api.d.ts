@@ -17,6 +17,8 @@ declare global {
       >;
       getVersion: () => Promise<string>;
       openDataFolder: () => Promise<void>;
+      platform: NodeJS.Platform;
+      setOverlayTheme: (isDark: boolean) => Promise<void>;
     };
   }
 }

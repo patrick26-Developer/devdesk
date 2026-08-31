@@ -56,6 +56,11 @@ export default function App() {
   const activeTool = tools.find((tool) => tool.id === activeToolId);
   const ActiveComponent = activeTool?.component;
 
+  // Barre de titre intégrée : la barre utilitaire sert de zone de déplacement de la fenêtre.
+  const platform = typeof window !== 'undefined' ? window.api?.platform : undefined;
+  const dragPad =
+    platform === 'win32' ? 'pr-[140px]' : platform === 'darwin' ? 'pl-[76px]' : '';
+
   return (
     <div className="flex h-screen overflow-hidden bg-background text-foreground">
       <Sidebar
@@ -66,9 +71,12 @@ export default function App() {
       />
 
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        {/* Barre utilitaire : identité (mobile), palette de commandes, thème. */}
-        <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-border px-4 sm:px-6">
-          <div className="flex items-center gap-2">
+        {/* Barre utilitaire = zone de déplacement de la fenêtre (app-region: drag).
+            Les éléments interactifs doivent être marqués no-drag. */}
+        <header
+          className={`flex h-14 shrink-0 items-center justify-between gap-3 border-b border-border px-4 sm:px-6 [-webkit-app-region:drag] ${dragPad}`}
+        >
+          <div className="flex items-center gap-2 [-webkit-app-region:no-drag]">
             <SidebarToggle onClick={() => setSidebarOpen(true)} />
             <div className="flex items-center gap-2 md:hidden">
               <Logo className="h-6 w-6" />
@@ -76,7 +84,7 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 [-webkit-app-region:no-drag]">
             <button
               onClick={() => setPaletteOpen(true)}
               className="flex h-8 items-center gap-2 rounded-lg border border-border bg-card px-2.5 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"

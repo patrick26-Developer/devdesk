@@ -44,10 +44,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const resolvedTheme: ResolvedTheme =
     theme === 'system' ? (systemDark ? 'dark' : 'light') : theme;
 
-  // Applique/retire la classe .dark sur <html> et persiste le CHOIX (pas la résolution).
+  // Applique/retire la classe .dark sur <html>, persiste le CHOIX (pas la résolution),
+  // et met à jour la couleur des contrôles de fenêtre intégrés (Windows).
   useEffect(() => {
     document.documentElement.classList.toggle('dark', resolvedTheme === 'dark');
     localStorage.setItem(STORAGE_KEY, theme);
+    window.api?.setOverlayTheme?.(resolvedTheme === 'dark');
   }, [theme, resolvedTheme]);
 
   const value = useMemo<ThemeContextValue>(

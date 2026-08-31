@@ -105,6 +105,17 @@ ipcMain.handle('app:openDataFolder', async () => {
   await shell.openPath(app.getPath('userData'));
 });
 
+// Handler : ajuste la couleur des symboles des contrôles de fenêtre (Windows) selon le thème.
+ipcMain.handle('window:setOverlayTheme', (event, isDark: boolean) => {
+  if (process.platform !== 'win32') return;
+  const win = BrowserWindow.fromWebContents(event.sender);
+  win?.setTitleBarOverlay({
+    color: '#00000000',
+    symbolColor: isDark ? '#e5e7eb' : '#3f3f46',
+    height: 56,
+  });
+});
+
 // Fonction qui crée la fenêtre principale de DevDesk
 const createWindow = () => {
   // En développement, l'app tourne depuis le dossier du projet (process.cwd() est fiable).
@@ -113,6 +124,19 @@ const createWindow = () => {
   const iconPath = app.isPackaged
     ? path.join(process.resourcesPath, 'assets', 'branding', 'devdesk-icon.png')
     : path.join(process.cwd(), 'assets', 'branding', 'devdesk-icon.png');
+
+  // Barre de titre intégrée à l'interface : sur Windows on garde les boutons système
+  // en superposition (titleBarOverlay), sur macOS les pastilles sont décalées, ailleurs
+  // on conserve le cadre natif (pas d'alternative fiable aux contrôles).
+  const platformChrome =
+    process.platform === 'win32'
+      ? {
+          titleBarStyle: 'hidden' as const,
+          titleBarOverlay: { color: '#00000000', symbolColor: '#3f3f46', height: 56 },
+        }
+      : process.platform === 'darwin'
+        ? { titleBarStyle: 'hiddenInset' as const, trafficLightPosition: { x: 16, y: 20 } }
+        : {};
 
   const mainWindow = new BrowserWindow({
     width: 1440,
@@ -124,6 +148,7 @@ const createWindow = () => {
     icon: iconPath,
     backgroundColor: '#09090B',
     autoHideMenuBar: true,
+    ...platformChrome,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,

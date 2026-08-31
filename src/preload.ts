@@ -16,4 +16,9 @@ contextBridge.exposeInMainWorld('api', {
   getVersion: (): Promise<string> => ipcRenderer.invoke('app:getVersion'),
   // Ouvre le dossier de données locales dans l'explorateur de fichiers
   openDataFolder: (): Promise<void> => ipcRenderer.invoke('app:openDataFolder'),
+  // Plateforme hôte, pour adapter la barre de titre intégrée
+  platform: process.platform,
+  // Ajuste la couleur des contrôles de fenêtre (Windows) selon le thème résolu
+  setOverlayTheme: (isDark: boolean): Promise<void> =>
+    ipcRenderer.invoke('window:setOverlayTheme', isDark),
 });

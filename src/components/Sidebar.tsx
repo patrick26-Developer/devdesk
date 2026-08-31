@@ -56,8 +56,8 @@ export default function Sidebar({ activeToolId, onSelectTool, isOpen, onClose }:
           isOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        {/* En-tête */}
-        <div className="flex items-center justify-between border-b border-sidebar-border/70 px-5 py-5">
+        {/* En-tête (aussi zone de déplacement de la fenêtre sur grand écran) */}
+        <div className="flex items-center justify-between border-b border-sidebar-border/70 px-5 py-5 md:[-webkit-app-region:drag]">
           <div className="flex items-center gap-3.5">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-sidebar-border bg-sidebar-accent/50 shadow-sm">
               <Logo className="h-7 w-7" />
@@ -73,7 +73,7 @@ export default function Sidebar({ activeToolId, onSelectTool, isOpen, onClose }:
           <button
             onClick={onClose}
             aria-label="Fermer le menu"
-            className="rounded-lg p-1.5 text-muted-foreground hover:bg-sidebar-accent md:hidden"
+            className="rounded-lg p-1.5 text-muted-foreground hover:bg-sidebar-accent md:hidden [-webkit-app-region:no-drag]"
           >
             <X className="h-4 w-4" />
           </button>
