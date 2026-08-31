@@ -53,7 +53,7 @@ import UrlTool from './url/UrlTool';
 import MarkdownPreview from './markdown/MarkdownPreview';
 import LoremGenerator from './lorem/LoremGenerator';
 import QrCodeGenerator from './qrcode/QrCodeGenerator';
-import ApiTester from './api-tester/ApiTester';
+import ApiClient from './api-client/ApiClient';
 import CaseConverter from './case/CaseConverter';
 import PasswordGenerator from './password/PasswordGenerator';
 import ContrastChecker from './contrast/ContrastChecker';
@@ -194,12 +194,15 @@ export const tools: Tool[] = [
   },
   {
     id: 'api-tester',
-    name: 'API Tester',
-    description: 'Testez vos endpoints HTTP directement depuis DevDesk.',
+    name: 'API Client',
+    description: 'Atelier d’API : environnements, collections, variables, tests, runner.',
     icon: Globe,
-    component: ApiTester,
+    component: ApiClient,
     category: 'web',
-    keywords: ['api', 'http', 'rest', 'requête', 'endpoint', 'curl', 'fetch'],
+    keywords: [
+      'api', 'http', 'rest', 'requête', 'endpoint', 'curl', 'fetch', 'postman',
+      'collection', 'environnement', 'variable', 'token', 'bearer', 'openapi', 'swagger',
+    ],
   },
   {
     id: 'case',

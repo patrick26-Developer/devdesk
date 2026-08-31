@@ -88,9 +88,9 @@ const GUIDE_CONTENT: Record<string, GuideEntry> = {
   },
 
   'api-tester': {
-    role: "Envoie des requêtes HTTP et affiche leurs réponses.",
-    besoin: "Tester rapidement un endpoint API sans quitter DevDesk.",
-    usage: "Choisis la méthode, saisis l'URL, configure les données puis envoie la requête.",
+    role: "Atelier d'API complet : requêtes, environnements, variables {{…}}, collections, tests et runner.",
+    besoin: "Développer et tester son backend sans copier-coller les tokens ni quitter DevDesk.",
+    usage: "Définis un environnement (baseUrl, accessToken), envoie le login, laisse la règle d'extraction remplir {{accessToken}}, puis réutilise-le en auth Bearer sur les autres requêtes.",
   },
 
   case: {

@@ -21,11 +21,16 @@
       href="/branding/devdesk-icon.png"
     />
 
+    <!--
+      'unsafe-eval' est nécessaire aux scripts de test / pré-requête de l'API Client
+      (exécutés via new Function). L'app n'évalue jamais de contenu distant :
+      les réponses d'API sont affichées comme texte, le Markdown est nettoyé par DOMPurify.
+    -->
     <meta
       http-equiv="Content-Security-Policy"
       content="
         default-src 'self';
-        script-src 'self';
+        script-src 'self' 'unsafe-eval';
         style-src 'self' 'unsafe-inline';
         img-src 'self' data:;
         connect-src 'self' https: http:;

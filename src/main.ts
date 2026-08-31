@@ -36,7 +36,11 @@ interface HttpRequestInput {
   method: string;
   headers: Record<string, string>;
   body: string;
+  timeoutMs?: number;
 }
+
+// Fichier de l'état de l'API Client (collections, environnements, historique).
+const apiClientFilePath = path.join(app.getPath('userData'), 'api-client.json');
 
 // Handler : récupère les favoris
 ipcMain.handle('favorites:get', async () => {
@@ -63,12 +67,16 @@ ipcMain.handle('favorites:clear', async () => {
 // Handler : exécute une requête HTTP côté main (sans CORS)
 ipcMain.handle('http:request', async (_event, input: HttpRequestInput) => {
   const startTime = Date.now();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), input.timeoutMs && input.timeoutMs > 0 ? input.timeoutMs : 30000);
 
   try {
     const response = await fetch(input.url, {
       method: input.method,
       headers: input.headers,
-      body: ['GET', 'HEAD'].includes(input.method) ? undefined : input.body || undefined,
+      body: ['GET', 'HEAD'].includes(input.method.toUpperCase()) ? undefined : input.body || undefined,
+      redirect: 'follow',
+      signal: controller.signal,
     });
 
     const responseBody = await response.text();
@@ -85,14 +93,35 @@ ipcMain.handle('http:request', async (_event, input: HttpRequestInput) => {
       headers: responseHeaders,
       body: responseBody,
       timeMs: Date.now() - startTime,
+      sizeBytes: Buffer.byteLength(responseBody, 'utf-8'),
+      finalUrl: response.url,
+      redirected: response.redirected,
     };
   } catch (e) {
+    const err = e as Error;
     return {
       ok: false,
-      error: (e as Error).message,
+      error: err.name === 'AbortError' ? `Délai dépassé (${(input.timeoutMs ?? 30000)} ms)` : err.message,
       timeMs: Date.now() - startTime,
     };
+  } finally {
+    clearTimeout(timeout);
   }
+});
+
+// Handler : lit l'état de l'API Client (ou null si absent)
+ipcMain.handle('apiclient:read', async () => {
+  try {
+    const raw = await fs.readFile(apiClientFilePath, 'utf-8');
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+});
+
+// Handler : écrit l'état de l'API Client
+ipcMain.handle('apiclient:write', async (_event, state: unknown) => {
+  await fs.writeFile(apiClientFilePath, JSON.stringify(state, null, 2), 'utf-8');
 });
 
 // Handler : renvoie la version de l'app

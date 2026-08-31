@@ -11,7 +11,11 @@ contextBridge.exposeInMainWorld('api', {
     method: string;
     headers: Record<string, string>;
     body: string;
+    timeoutMs?: number;
   }) => ipcRenderer.invoke('http:request', input),
+  // API Client : persistance de l'état (collections, environnements, historique)
+  apiClientRead: (): Promise<unknown> => ipcRenderer.invoke('apiclient:read'),
+  apiClientWrite: (state: unknown): Promise<void> => ipcRenderer.invoke('apiclient:write', state),
   // Récupère le numéro de version affiché dans "À propos"
   getVersion: (): Promise<string> => ipcRenderer.invoke('app:getVersion'),
   // Ouvre le dossier de données locales dans l'explorateur de fichiers
