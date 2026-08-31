@@ -141,7 +141,7 @@ ipcMain.handle('window:setOverlayTheme', (event, isDark: boolean) => {
   win?.setTitleBarOverlay({
     color: '#00000000',
     symbolColor: isDark ? '#e5e7eb' : '#3f3f46',
-    height: 56,
+    height: 48,
   });
 });
 
@@ -161,10 +161,10 @@ const createWindow = () => {
     process.platform === 'win32'
       ? {
           titleBarStyle: 'hidden' as const,
-          titleBarOverlay: { color: '#00000000', symbolColor: '#3f3f46', height: 56 },
+          titleBarOverlay: { color: '#00000000', symbolColor: '#3f3f46', height: 48 },
         }
       : process.platform === 'darwin'
-        ? { titleBarStyle: 'hiddenInset' as const, trafficLightPosition: { x: 16, y: 20 } }
+        ? { titleBarStyle: 'hiddenInset' as const, trafficLightPosition: { x: 16, y: 16 } }
         : {};
 
   const mainWindow = new BrowserWindow({
