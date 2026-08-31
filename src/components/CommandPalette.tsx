@@ -74,7 +74,12 @@ export default function CommandPalette({ open, onOpenChange, onNavigate }: Comma
       description="Rechercher un outil ou une commande"
       className="sm:max-w-lg"
     >
-      <Command>
+      <Command
+        onKeyDown={(e) => {
+          // Filet de sécurité : garantit la fermeture sur Échap même si le Dialog ne capte pas la touche.
+          if (e.key === 'Escape') onOpenChange(false);
+        }}
+      >
         <CommandInput placeholder="Rechercher un outil, une page, un thème..." />
         <CommandList>
         <CommandEmpty>Aucun résultat.</CommandEmpty>
