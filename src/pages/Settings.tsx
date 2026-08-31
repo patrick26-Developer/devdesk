@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import ThemeToggle from '@/components/ThemeToggle';
+import PageHeader from '@/components/PageHeader';
 import { useTheme } from '@/hooks/useTheme';
 import { useFavorites } from '@/hooks/useFavorites';
 import {
@@ -54,45 +55,12 @@ export default function Settings() {
     <div className="min-h-full p-6 xl:p-8">
       <div className="mx-auto max-w-5xl space-y-8">
 
-        {/* =========================================================
-            HEADER
-        ========================================================= */}
-        <section>
-          <div className="mb-3 flex items-center gap-3">
-
-            <div
-              className="
-                flex
-                h-10
-                w-10
-                items-center
-                justify-center
-                rounded-xl
-                border
-                border-violet-500/15
-                bg-violet-500/10
-                text-violet-500
-              "
-            >
-              <Palette className="h-5 w-5" />
-            </div>
-
-            <div>
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
-                Configuration
-              </p>
-
-              <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-                Paramètres
-              </h1>
-            </div>
-          </div>
-
-          <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-            Personnalisez votre expérience DevDesk et gérez les données
-            conservées localement sur votre machine.
-          </p>
-        </section>
+        <PageHeader
+          icon={Palette}
+          eyebrow="Configuration"
+          title="Paramètres"
+          description="Personnalisez votre expérience DevDesk et gérez les données conservées localement sur votre machine."
+        />
 
         {/* =========================================================
             APERÇU / STATUS

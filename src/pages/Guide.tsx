@@ -1,4 +1,5 @@
 import { tools } from '@/tools';
+import PageHeader from '@/components/PageHeader';
 import {
   ArrowRight,
   BookOpen,
@@ -98,25 +99,12 @@ export default function Guide() {
     <div className="min-h-full p-8">
       <div className="mx-auto max-w-5xl space-y-8">
 
-        {/* Header */}
-        <div>
-          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <BookOpen className="h-5 w-5" />
-          </div>
-
-          <p className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary">
-            Centre d'aide
-          </p>
-
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Guide d'utilisation
-          </h1>
-
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            Comprends le rôle de chaque outil, le problème qu'il résout et
-            comment l'utiliser efficacement.
-          </p>
-        </div>
+        <PageHeader
+          icon={BookOpen}
+          eyebrow="Centre d'aide"
+          title="Guide d'utilisation"
+          description="Comprends le rôle de chaque outil, le problème qu'il résout et comment l'utiliser efficacement."
+        />
 
         {/* Quick info */}
         <div className="rounded-xl border border-primary/20 bg-primary/[0.04] p-5">

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { tools } from '@/tools';
+import PageHeader from '@/components/PageHeader';
 // Import ES du logo réel : garantit un chemin correct en dev ET en production (voir explication plus haut)
 import logoSrc from '../../assets/branding/devdesk-icon.png';
 import {
@@ -23,21 +24,11 @@ export default function About() {
     <div className="min-h-full p-8">
       <div className="mx-auto max-w-5xl space-y-8">
 
-        {/* Header */}
-        <div>
-          <p className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-primary">
-            À propos
-          </p>
-
-          <h1 className="text-2xl font-semibold tracking-tight">
-            DevDesk
-          </h1>
-
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            Une boîte à outils développeur moderne, locale et pensée pour
-            centraliser les petites tâches techniques du quotidien.
-          </p>
-        </div>
+        <PageHeader
+          eyebrow="À propos"
+          title="DevDesk"
+          description="Une boîte à outils développeur moderne, locale et pensée pour centraliser les petites tâches techniques du quotidien."
+        />
 
         {/* Hero */}
         <section className="relative overflow-hidden rounded-2xl border border-border bg-card">

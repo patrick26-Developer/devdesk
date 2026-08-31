@@ -1,6 +1,6 @@
 import { tools } from '@/tools';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, BookOpen, Command, Keyboard, RefreshCw, Sparkles } from 'lucide-react';
+import { ArrowRight, BookOpen, Command, Keyboard, PanelLeft, Sparkles, X } from 'lucide-react';
 import heroImage from '../../assets/branding/bg-home2.jpg';
 
 interface HomeProps {
@@ -140,8 +140,8 @@ export default function Home({ onSelectTool }: HomeProps) {
             <div className="grid grid-cols-3 gap-3">
               {[
                 { keys: 'Ctrl+K', label: 'Recherche', icon: Command, color: 'text-sky-500', bg: 'bg-sky-500/10' },
-                { keys: 'Ctrl+B', label: 'Thème', icon: Sparkles, color: 'text-violet-500', bg: 'bg-violet-500/10' },
-                { keys: 'Ctrl+R', label: 'Actualiser', icon: RefreshCw, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+                { keys: 'Ctrl+B', label: 'Sidebar', icon: PanelLeft, color: 'text-violet-500', bg: 'bg-violet-500/10' },
+                { keys: 'Échap', label: 'Fermer', icon: X, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
               ].map((shortcut) => {
                 const Icon = shortcut.icon;
                 return (

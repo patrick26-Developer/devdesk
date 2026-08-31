@@ -5,43 +5,32 @@ import Settings from '@/pages/Settings';
 import About from '@/pages/About';
 import Guide from '@/pages/Guide';
 import ThemeToggle from '@/components/ThemeToggle';
-import { useTheme } from '@/hooks/useTheme';
+import Logo from '@/components/Logo';
 import { tools } from '@/tools';
 
 export default function App() {
   const [activeToolId, setActiveToolId] = useState('home');
   // Contrôle l'affichage de la sidebar en mode fenêtre étroite (drawer). Sans effet sur grand écran (toujours visible).
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { toggleTheme } = useTheme();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl/Cmd + B : ouvre/ferme la sidebar (convention). Sans effet sur grand écran où elle est fixe.
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
         e.preventDefault();
-        toggleTheme();
+        setSidebarOpen((open) => !open);
       }
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'r') {
-        e.preventDefault();
-        window.location.reload();
+      // Échap : referme le drawer mobile.
+      if (e.key === 'Escape') {
+        setSidebarOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [toggleTheme]);
+  }, []);
 
   const activeTool = tools.find((tool) => tool.id === activeToolId);
   const ActiveComponent = activeTool?.component;
-
-  const headerInfo =
-    activeToolId === 'settings'
-      ? { title: 'Paramètres', subtitle: 'Préférences locales.' }
-      : activeToolId === 'about'
-        ? { title: 'À propos', subtitle: 'Informations sur DevDesk.' }
-        : activeToolId === 'guide'
-          ? { title: "Guide d'utilisation", subtitle: 'Comment utiliser chaque outil.' }
-          : activeTool
-            ? { title: activeTool.name, subtitle: 'Utilitaire développeur professionnel.' }
-            : { title: 'Accueil', subtitle: 'Vue d’ensemble de vos outils.' };
 
   return (
     <div className="flex h-screen overflow-hidden bg-background text-foreground">
@@ -53,20 +42,21 @@ export default function App() {
       />
 
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <header className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-8 sm:py-4">
-          <div className="flex min-w-0 items-center gap-2">
-            {/* Bouton hamburger : visible uniquement sous md (voir classe md:hidden dans SidebarToggle) */}
+        {/* Barre utilitaire : identité (mobile) + actions globales. L'identité de la page/outil
+            vit désormais dans ToolShell / PageHeader, plus dans cette barre. */}
+        <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-border px-4 sm:px-6">
+          <div className="flex items-center gap-2">
             <SidebarToggle onClick={() => setSidebarOpen(true)} />
-            <div className="min-w-0">
-              <h2 className="truncate text-base font-semibold sm:text-lg">{headerInfo.title}</h2>
-              {/* Sous-titre masqué sur très petite largeur pour ne pas encombrer l'en-tête */}
-              <p className="hidden truncate text-sm text-muted-foreground sm:block">{headerInfo.subtitle}</p>
+            <div className="flex items-center gap-2 md:hidden">
+              <Logo className="h-6 w-6" />
+              <span className="text-sm font-semibold tracking-tight">DevDesk</span>
             </div>
           </div>
+
           <ThemeToggle />
         </header>
 
-        <div className="flex-1 overflow-auto">
+        <div className="min-h-0 flex-1 overflow-auto">
           {activeToolId === 'settings' && <Settings />}
           {activeToolId === 'about' && <About />}
           {activeToolId === 'guide' && <Guide />}
