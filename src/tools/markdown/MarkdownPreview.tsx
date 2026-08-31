@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import { usePersistentState } from '@/hooks/usePersistentState';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 
@@ -11,7 +12,10 @@ import { Eye, FileCode2, ShieldCheck } from 'lucide-react';
 
 export default function MarkdownPreview() {
   const tool = getTool('markdown')!;
-  const [markdown, setMarkdown] = useState('# Titre\n\nTape du **Markdown** ici.');
+  const [markdown, setMarkdown] = usePersistentState(
+    'markdown:content',
+    '# Titre\n\nTape du **Markdown** ici.'
+  );
 
   const safeHtml = useMemo(() => {
     const rawHtml = marked.parse(markdown, { async: false }) as string;

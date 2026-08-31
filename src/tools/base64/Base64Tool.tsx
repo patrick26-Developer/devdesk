@@ -6,6 +6,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 
+import { usePersistentState } from '@/hooks/usePersistentState';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import ToolShell from '@/components/tool/ToolShell';
@@ -15,7 +16,7 @@ import { getTool } from '@/tools';
 
 export default function Base64Tool() {
   const tool = getTool('base64')!;
-  const [input, setInput] = useState('');
+  const [input, setInput] = usePersistentState('base64:input', '');
   const [output, setOutput] = useState('');
   const [error, setError] = useState<string | null>(null);
 

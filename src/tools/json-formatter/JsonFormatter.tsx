@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { usePersistentState } from '@/hooks/usePersistentState';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import ToolShell from '@/components/tool/ToolShell';
@@ -16,7 +17,7 @@ import {
 
 export default function JsonFormatter() {
   const tool = getTool('json-formatter')!;
-  const [input, setInput] = useState('');
+  const [input, setInput] = usePersistentState('json-formatter:input', '');
   const [output, setOutput] = useState('');
   const [error, setError] = useState<string | null>(null);
 

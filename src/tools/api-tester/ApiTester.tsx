@@ -11,6 +11,7 @@ import {
   XCircle,
 } from 'lucide-react';
 
+import { usePersistentState } from '@/hooks/usePersistentState';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -34,10 +35,13 @@ const DEFAULT_URL = 'https://jsonplaceholder.typicode.com/posts/1';
 
 export default function ApiTester() {
   const tool = getTool('api-tester')!;
-  const [method, setMethod] = useState('GET');
-  const [url, setUrl] = useState(DEFAULT_URL);
-  const [headersText, setHeadersText] = useState('Content-Type: application/json');
-  const [body, setBody] = useState('');
+  const [method, setMethod] = usePersistentState('api-tester:method', 'GET');
+  const [url, setUrl] = usePersistentState('api-tester:url', DEFAULT_URL);
+  const [headersText, setHeadersText] = usePersistentState(
+    'api-tester:headers',
+    'Content-Type: application/json'
+  );
+  const [body, setBody] = usePersistentState('api-tester:body', '');
   const [result, setResult] =
     useState<Awaited<ReturnType<typeof window.api.httpRequest>> | null>(null);
   const [loading, setLoading] = useState(false);

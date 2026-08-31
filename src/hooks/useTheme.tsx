@@ -1,61 +1,73 @@
-// createContext/useContext : partage l'état du thème entre tous les composants sans prop-drilling
-// useState/useEffect : gère la valeur courante et synchronise avec le DOM + localStorage
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+// Gestion du thème avec 3 états : 'light', 'dark' ou 'system' (suit la préférence de l'OS).
+// createContext/useContext : partage l'état sans prop-drilling.
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
-// Seules deux valeurs possibles pour le thème de l'app
-type Theme = 'light' | 'dark';
+export type Theme = 'light' | 'dark' | 'system';
+export type ResolvedTheme = 'light' | 'dark';
 
-// Forme de ce que le contexte expose : la valeur actuelle + la fonction pour basculer
 interface ThemeContextValue {
+  // Choix de l'utilisateur.
   theme: Theme;
+  // Thème réellement appliqué (résout 'system' selon l'OS).
+  resolvedTheme: ResolvedTheme;
+  setTheme: (theme: Theme) => void;
+  // Cycle light -> dark -> system, conservé pour les raccourcis / compat.
   toggleTheme: () => void;
 }
 
-// Contexte React, initialisé à null : sera rempli par le Provider plus bas
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-// Clé utilisée pour sauvegarder le choix de thème dans le localStorage du renderer
 const STORAGE_KEY = 'devdesk-theme';
 
-// Détermine le thème initial au tout premier chargement de l'app :
-// 1) si l'utilisateur a déjà choisi un thème avant (localStorage), on le respecte
-// 2) sinon, on suit la préférence système (dark mode OS) via matchMedia
 function getInitialTheme(): Theme {
   const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored === 'light' || stored === 'dark') return stored;
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  if (stored === 'light' || stored === 'dark' || stored === 'system') return stored;
+  return 'system';
 }
 
-// Provider à placer une seule fois, tout en haut de l'arbre React (dans main.tsx)
+function systemPrefersDark(): boolean {
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  // État React : la fonction passée à useState ne s'exécute qu'une fois, au tout premier rendu
-  const [theme, setTheme] = useState<Theme>(getInitialTheme);
+  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
+  const [systemDark, setSystemDark] = useState<boolean>(systemPrefersDark);
 
-  // À chaque changement de thème : applique/retire la classe .dark sur <html>, et persiste le choix
+  // Suit les changements de préférence de l'OS (utile quand theme === 'system').
   useEffect(() => {
-    const root = document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
+    const mql = window.matchMedia('(prefers-color-scheme: dark)');
+    const onChange = (e: MediaQueryListEvent) => setSystemDark(e.matches);
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
+  }, []);
+
+  const resolvedTheme: ResolvedTheme =
+    theme === 'system' ? (systemDark ? 'dark' : 'light') : theme;
+
+  // Applique/retire la classe .dark sur <html> et persiste le CHOIX (pas la résolution).
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', resolvedTheme === 'dark');
     localStorage.setItem(STORAGE_KEY, theme);
-  }, [theme]);
+  }, [theme, resolvedTheme]);
 
-  // Fonction exposée pour basculer entre les deux thèmes
-  const toggleTheme = () => setTheme((current) => (current === 'dark' ? 'light' : 'dark'));
-
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
+  const value = useMemo<ThemeContextValue>(
+    () => ({
+      theme,
+      resolvedTheme,
+      setTheme: setThemeState,
+      toggleTheme: () =>
+        setThemeState((current) =>
+          current === 'light' ? 'dark' : current === 'dark' ? 'system' : 'light'
+        ),
+    }),
+    [theme, resolvedTheme]
   );
+
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
-// Hook pratique pour consommer le contexte depuis n'importe quel composant
 export function useTheme() {
   const context = useContext(ThemeContext);
-  // Erreur explicite si le hook est utilisé hors du Provider — évite un bug silencieux
   if (!context) {
     throw new Error('useTheme doit être utilisé à l’intérieur de <ThemeProvider>');
   }

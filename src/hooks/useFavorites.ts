@@ -1,29 +1,48 @@
-// useState : stocke l'état local (la liste des favoris) et déclenche un re-render quand elle change
-// useEffect : exécute du code au montage du composant (ici : charger les favoris une fois au démarrage)
-import { useEffect, useState } from 'react';
+// Store externe partagé pour les favoris : toutes les instances de useFavorites()
+// (sidebar, paramètres, palette de commandes...) voient le même état et se
+// re-rendent ensemble. La source de vérité reste le fichier disque géré par le main process.
+import { useCallback, useSyncExternalStore } from 'react';
 
-// Hook personnalisé qui encapsule toute la logique de gestion des favoris.
-// N'importe quel composant peut l'utiliser avec : const { favorites, toggleFavorite } = useFavorites();
+let favorites: string[] = [];
+let loaded = false;
+const listeners = new Set<() => void>();
+
+function emit() {
+  for (const listener of listeners) listener();
+}
+
+async function load() {
+  favorites = await window.api.getFavorites();
+  loaded = true;
+  emit();
+}
+
+function subscribe(callback: () => void) {
+  listeners.add(callback);
+  if (!loaded) load();
+  return () => {
+    listeners.delete(callback);
+  };
+}
+
+function getSnapshot() {
+  return favorites;
+}
+
 export function useFavorites() {
-  // État local : tableau des IDs d'outils marqués comme favoris. Vide au tout premier rendu.
-  const [favorites, setFavorites] = useState<string[]>([]);
+  const favs = useSyncExternalStore(subscribe, getSnapshot);
 
-  // Au montage du composant (tableau de dépendances vide = exécuté une seule fois),
-  // on va chercher les favoris déjà sauvegardés sur disque via l'API exposée par preload.ts
-  useEffect(() => {
-    window.api.getFavorites().then(setFavorites);
+  const toggleFavorite = useCallback(async (toolId: string) => {
+    favorites = await window.api.toggleFavorite(toolId);
+    emit();
   }, []);
 
-  // Fonction exposée par le hook : bascule un favori et met à jour l'état local
-  // avec la réponse renvoyée par le main process (source de vérité = le fichier disque)
-  const toggleFavorite = async (toolId: string) => {
-    const updated = await window.api.toggleFavorite(toolId);
-    setFavorites(updated);
-  };
+  const clearFavorites = useCallback(async () => {
+    favorites = await window.api.clearFavorites();
+    emit();
+  }, []);
 
-  // Fonction pratique pour savoir si un outil donné est actuellement favori
-  const isFavorite = (toolId: string) => favorites.includes(toolId);
+  const isFavorite = useCallback((toolId: string) => favs.includes(toolId), [favs]);
 
-  // Le hook renvoie tout ce dont un composant a besoin pour afficher/gérer les favoris
-  return { favorites, toggleFavorite, isFavorite };
+  return { favorites: favs, toggleFavorite, clearFavorites, isFavorite };
 }

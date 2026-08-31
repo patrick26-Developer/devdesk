@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import { usePersistentState } from '@/hooks/usePersistentState';
 import { Textarea } from '@/components/ui/textarea';
 import ToolShell from '@/components/tool/ToolShell';
 import { Panel, PanelHeader } from '@/components/tool/Panel';
@@ -15,7 +16,7 @@ function base64UrlDecode(str: string): string {
 
 export default function JwtDecoder() {
   const tool = getTool('jwt')!;
-  const [token, setToken] = useState('');
+  const [token, setToken] = usePersistentState('jwt:token', '');
 
   const decoded = useMemo(() => {
     if (!token.trim()) return null;

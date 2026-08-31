@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import { usePersistentState } from '@/hooks/usePersistentState';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import ToolShell from '@/components/tool/ToolShell';
@@ -8,9 +9,9 @@ import { SearchCheck } from 'lucide-react';
 
 export default function RegexTester() {
   const tool = getTool('regex')!;
-  const [pattern, setPattern] = useState('');
-  const [flags, setFlags] = useState('g');
-  const [text, setText] = useState('');
+  const [pattern, setPattern] = usePersistentState('regex:pattern', '');
+  const [flags, setFlags] = usePersistentState('regex:flags', 'g');
+  const [text, setText] = usePersistentState('regex:text', '');
 
   const result = useMemo(() => {
     if (!pattern) return { matches: [] as RegExpMatchArray[], error: null as string | null };

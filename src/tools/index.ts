@@ -22,6 +22,10 @@ import type { ComponentType } from 'react';
 import type { Category, CategoryKey } from './categories';
 import { categories, getCategory } from './categories';
 
+// Ré-export pour que les consommateurs importent tout depuis '@/tools'
+export { categories, getCategory } from './categories';
+export type { Category, CategoryKey } from './categories';
+
 // Import de tous les composants d'outils
 import JsonFormatter from './json-formatter/JsonFormatter';
 import Base64Tool from './base64/Base64Tool';

@@ -7,6 +7,7 @@ import { Check, Copy } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { notify } from '@/lib/notify';
 
 interface CopyButtonProps {
   value: string;
@@ -18,7 +19,9 @@ interface CopyButtonProps {
   variant?: 'ghost' | 'secondary' | 'outline';
   size?: 'sm' | 'icon-sm';
   className?: string;
-  // Appelé après une copie réussie (ex. déclencher un toast).
+  // Message affiché dans le toast après copie. `false` désactive le toast.
+  toastMessage?: string | false;
+  // Appelé après une copie réussie.
   onCopied?: (value: string) => void;
 }
 
@@ -30,6 +33,7 @@ export default function CopyButton({
   variant = 'ghost',
   size,
   className,
+  toastMessage = 'Copié dans le presse-papiers',
   onCopied,
 }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
@@ -46,10 +50,11 @@ export default function CopyButton({
 
     setCopied(true);
     onCopied?.(value);
+    if (toastMessage !== false) notify(toastMessage);
 
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => setCopied(false), 1500);
-  }, [value, onCopied]);
+  }, [value, onCopied, toastMessage]);
 
   const iconOnly = !label;
   const resolvedSize = size ?? (iconOnly ? 'icon-sm' : 'sm');

@@ -1,7 +1,19 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import ThemeToggle from '@/components/ThemeToggle';
 import PageHeader from '@/components/PageHeader';
+import { notify } from '@/lib/notify';
 import { useTheme } from '@/hooks/useTheme';
 import { useFavorites } from '@/hooks/useFavorites';
 import {
@@ -10,7 +22,6 @@ import {
   Star,
   RotateCcw,
   Info,
-  Check,
   Monitor,
   HardDrive,
   Database,
@@ -19,11 +30,10 @@ import {
 } from 'lucide-react';
 
 export default function Settings() {
-  const { theme } = useTheme();
+  const { theme, resolvedTheme } = useTheme();
   const { favorites } = useFavorites();
 
   const [version, setVersion] = useState('');
-  const [cleared, setCleared] = useState(false);
 
   useEffect(() => {
     window.api.getVersion().then(setVersion);
@@ -34,21 +44,8 @@ export default function Settings() {
   };
 
   const clearFavorites = async () => {
-    if (
-      !confirm(
-        'Retirer tous les favoris ? Cette action est irréversible.'
-      )
-    ) {
-      return;
-    }
-
     await window.api.clearFavorites();
-
-    setCleared(true);
-
-    setTimeout(() => {
-      setCleared(false);
-    }, 1500);
+    notify('Favoris réinitialisés');
   };
 
   return (
@@ -217,9 +214,11 @@ export default function Settings() {
                   </p>
 
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {theme === 'dark'
-                      ? 'Mode sombre · Dark Slate'
-                      : 'Mode clair · Light'}
+                    {theme === 'system'
+                      ? `Système · actuellement ${resolvedTheme === 'dark' ? 'sombre' : 'clair'}`
+                      : theme === 'dark'
+                        ? 'Mode sombre'
+                        : 'Mode clair'}
                   </p>
                 </div>
               </div>
@@ -388,25 +387,39 @@ export default function Settings() {
                 </div>
               </div>
 
-              <Button
-                variant={cleared ? 'secondary' : 'destructive'}
-                size="sm"
-                onClick={clearFavorites}
-                disabled={favorites.length === 0 && !cleared}
-                className="shrink-0 gap-1.5"
-              >
-                {cleared ? (
-                  <>
-                    <Check className="h-3.5 w-3.5" />
-                    Effacé
-                  </>
-                ) : (
-                  <>
-                    <RotateCcw className="h-3.5 w-3.5" />
-                    Réinitialiser
-                  </>
-                )}
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger
+                  render={
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      disabled={favorites.length === 0}
+                      className="shrink-0 gap-1.5"
+                    />
+                  }
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  Réinitialiser
+                </AlertDialogTrigger>
+
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Retirer tous les favoris ?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Les {favorites.length} outil{favorites.length > 1 ? 's' : ''} marqué
+                      {favorites.length > 1 ? 's' : ''} comme favori
+                      {favorites.length > 1 ? 's' : ''} seront retiré
+                      {favorites.length > 1 ? 's' : ''}. Cette action est irréversible.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                    <AlertDialogAction variant="destructive" onClick={clearFavorites}>
+                      Tout retirer
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         </section>
