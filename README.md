@@ -25,8 +25,14 @@ Ce projet constitue également une base de référence pour une architecture Ele
 - Lorem Generator : génération de texte de remplissage
 - QR Code Generator : génération et export de QR codes au format PNG
 - API Tester : client HTTP pour tester des endpoints (méthodes, en-têtes, corps de requête)
+- Case Converter : conversion entre camelCase, snake_case, kebab-case, PascalCase, CONSTANT_CASE, etc.
+- Password Generator : génération de mots de passe aléatoires (Web Crypto), avec estimation d'entropie
+- Contrast Checker : ratio de contraste entre deux couleurs et conformité WCAG (AA / AAA)
+- Text Diff : comparaison de deux textes ligne à ligne avec surlignage des différences
+- Number Base Converter : conversion d'un entier entre binaire, octal, décimal et hexadécimal
+- Text & Line Utilities : tri, déduplication, nettoyage et comptage de lignes
 
-L'application inclut également un système de favoris persistés localement, une recherche d'outils, un thème clair et sombre avec détection de la préférence système, ainsi que des raccourcis clavier.
+L'application inclut également une palette de commandes (Ctrl/Cmd+K), un système de favoris persistés localement regroupés par catégorie, une recherche d'outils, un thème clair / sombre / système, la persistance des saisies entre sessions, ainsi que des raccourcis clavier.
 
 ## Stack technique
 

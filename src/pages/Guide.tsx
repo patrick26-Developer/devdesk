@@ -92,6 +92,42 @@ const GUIDE_CONTENT: Record<string, GuideEntry> = {
     besoin: "Tester rapidement un endpoint API sans quitter DevDesk.",
     usage: "Choisis la méthode, saisis l'URL, configure les données puis envoie la requête.",
   },
+
+  case: {
+    role: "Convertit un texte dans toutes les casses courantes (camelCase, snake_case, kebab-case, PascalCase, CONSTANT_CASE…).",
+    besoin: "Passer d'une convention de nommage à une autre sans renommer à la main.",
+    usage: "Saisis un identifiant ou une phrase ; chaque casse s'affiche avec un bouton de copie.",
+  },
+
+  password: {
+    role: "Génère des mots de passe aléatoires cryptographiquement sûrs.",
+    besoin: "Créer un secret fort sans dépendre d'un générateur en ligne.",
+    usage: "Règle la longueur et les jeux de caractères ; l'entropie estimée s'affiche sous le résultat.",
+  },
+
+  contrast: {
+    role: "Calcule le ratio de contraste entre deux couleurs et le confronte aux seuils WCAG.",
+    besoin: "Vérifier la lisibilité d'un texte pour l'accessibilité (AA / AAA).",
+    usage: "Choisis une couleur de texte et une couleur de fond ; les conformités s'affichent avec un aperçu.",
+  },
+
+  diff: {
+    role: "Compare deux textes ligne à ligne et surligne les ajouts et suppressions.",
+    besoin: "Repérer rapidement ce qui a changé entre deux versions d'un contenu.",
+    usage: "Colle l'ancienne version à gauche, la nouvelle à droite ; le résultat s'actualise en direct.",
+  },
+
+  'number-base': {
+    role: "Convertit un entier entre binaire, octal, décimal et hexadécimal.",
+    besoin: "Lire une valeur exprimée dans une base et l'obtenir dans les autres.",
+    usage: "Saisis un nombre (préfixes 0b / 0o / 0x acceptés) ; la représentation en bits est aussi affichée.",
+  },
+
+  'text-utils': {
+    role: "Applique des opérations de ligne : tri, déduplication, trim, casse, comptage.",
+    besoin: "Nettoyer une liste collée depuis un fichier ou un tableur.",
+    usage: "Colle une valeur par ligne puis clique sur une opération ; elle s'applique en place.",
+  },
 };
 
 export default function Guide() {
