@@ -1,4 +1,4 @@
-import { tools } from '@/tools';
+import { tools, getToolChip } from '@/tools';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, BookOpen, Command, Keyboard, PanelLeft, Sparkles, X } from 'lucide-react';
 import heroImage from '../../assets/branding/bg-home2.jpg';
@@ -8,14 +8,6 @@ interface HomeProps {
 }
 
 const FEATURED_TOOL_IDS = ['markdown', 'qrcode', 'api-tester'];
-
-const TOOL_ICON_STYLES: Record<string, { wrapper: string; icon: string }> = {
-  markdown: { wrapper: 'bg-blue-500/10 border-blue-500/15', icon: 'text-blue-500' },
-  qrcode: { wrapper: 'bg-emerald-500/10 border-emerald-500/15', icon: 'text-emerald-500' },
-  'api-tester': { wrapper: 'bg-orange-500/10 border-orange-500/15', icon: 'text-orange-500' },
-};
-
-const DEFAULT_ICON_STYLE = { wrapper: 'bg-primary/10 border-primary/15', icon: 'text-primary' };
 
 export default function Home({ onSelectTool }: HomeProps) {
   const featuredTools = FEATURED_TOOL_IDS.map((id) => tools.find((t) => t.id === id)).filter(Boolean) as typeof tools;
@@ -83,21 +75,20 @@ export default function Home({ onSelectTool }: HomeProps) {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
             {featuredTools.map((tool) => {
               const Icon = tool.icon;
-              const iconStyle = TOOL_ICON_STYLES[tool.id] ?? DEFAULT_ICON_STYLE;
 
               return (
                 <button
                   key={tool.id}
                   onClick={() => onSelectTool(tool.id)}
-                  // Effets de survol retirés : plus de -translate-y-0.5 ni de shadow-lg au survol, juste bordure/fond
                   className="group flex min-h-[160px] flex-col rounded-xl border border-border bg-card p-5 text-left transition-colors duration-200 hover:border-primary/30 hover:bg-accent/40"
                 >
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-lg border ${iconStyle.wrapper}`}>
-                    <Icon className={`h-5 w-5 ${iconStyle.icon}`} />
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-lg border ${getToolChip(tool)}`}>
+                    <Icon className="h-5 w-5" />
                   </div>
 
                   <div className="mt-4">
                     <h3 className="text-sm font-medium text-foreground">{tool.name}</h3>
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">{tool.description}</p>
                   </div>
 
                   <div className="mt-auto flex items-center gap-1.5 pt-5 text-xs font-medium text-muted-foreground transition-colors duration-200 group-hover:text-primary">

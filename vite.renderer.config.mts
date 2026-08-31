@@ -16,4 +16,15 @@ export default defineConfig({
   // CRITIQUE : force les chemins d'assets générés en relatif ('./xyz.png') plutôt qu'absolu ('/xyz.png').
   // Sans ça, tout chemin absolu casse une fois le HTML chargé via file:// en production.
   base: './',
+  build: {
+    // L'app est chargée en local (file://) : la taille de chunk n'a pas d'impact réseau.
+    chunkSizeWarningLimit: 900,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom'],
+        },
+      },
+    },
+  },
 });

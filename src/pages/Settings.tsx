@@ -62,33 +62,8 @@ export default function Settings() {
         {/* =========================================================
             APERÇU / STATUS
         ========================================================= */}
-        <section
-          className="
-            relative
-            overflow-hidden
-            rounded-2xl
-            border
-            border-border
-            bg-card
-            p-6
-          "
-        >
-          {/* Décoration */}
-          <div
-            className="
-              pointer-events-none
-              absolute
-              -right-20
-              -top-20
-              h-48
-              w-48
-              rounded-full
-              bg-violet-500/10
-              blur-3xl
-            "
-          />
-
-          <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+        <section className="overflow-hidden rounded-2xl border border-border bg-card p-6">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
 
             {/* Status */}
             <div className="flex items-center gap-4">

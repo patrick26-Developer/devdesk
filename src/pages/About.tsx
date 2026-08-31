@@ -31,12 +31,8 @@ export default function About() {
         />
 
         {/* Hero */}
-        <section className="relative overflow-hidden rounded-2xl border border-border bg-card">
-          {/* Glow décoratif */}
-          <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-24 left-1/3 h-48 w-48 rounded-full bg-cyan-500/5 blur-3xl" />
-
-          <div className="relative flex flex-col gap-6 p-7 md:flex-row md:items-center md:justify-between">
+        <section className="overflow-hidden rounded-2xl border border-border bg-card">
+          <div className="flex flex-col gap-6 p-7 md:flex-row md:items-center md:justify-between">
 
             <div className="flex items-center gap-5">
               <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-border bg-background shadow-sm">

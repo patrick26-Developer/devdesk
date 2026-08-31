@@ -100,19 +100,6 @@
   --sidebar-ring: oklch(0.67 0.18 280);
 }
 
-/* Couleurs de catégories d'outils */
-@theme {
-  --color-dev: #6366f1;
-  --color-sec: #ef4444;
-  --color-txt: #f59e0b;
-  --color-gen: #10b981;
-  --color-web: #06b6d4;
-  --color-des: #ec4899;
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-}
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -121,5 +108,9 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
     transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  /* Chiffres tabulaires partout où l'on affiche du monospace (compteurs, tailles, timers). */
+  .font-mono {
+    font-variant-numeric: tabular-nums;
   }
 }
