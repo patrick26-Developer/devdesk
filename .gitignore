@@ -90,3 +90,6 @@ typings/
 
 # Electron-Forge
 out/
+
+# Manual vite renderer build output
+dist/
