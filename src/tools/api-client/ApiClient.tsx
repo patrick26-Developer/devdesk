@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { notify } from '@/lib/notify';
 import { getTool } from '@/tools';
 import { parseCurl, toCurl } from './curl';
+import { toAxios, toFetch, toHttpie } from './snippets';
 
 import { actions, collectionOfRequest, findRequest, useApiClient } from './store';
 import { runRequest } from './runtime';
@@ -114,10 +115,11 @@ export default function ApiClient() {
     }
   };
 
-  const copyCurl = async () => {
+  const copySnippet = async (kind: 'curl' | 'fetch' | 'axios' | 'httpie') => {
+    const gen = { curl: toCurl, fetch: toFetch, axios: toAxios, httpie: toHttpie }[kind];
     try {
-      await navigator.clipboard.writeText(toCurl(state.draft));
-      notify('Commande cURL copiée');
+      await navigator.clipboard.writeText(gen(state.draft));
+      notify(`Snippet ${kind} copié`);
     } catch {
       /* presse-papiers indisponible */
     }
@@ -191,15 +193,23 @@ export default function ApiClient() {
                 title="Coller une commande cURL depuis le presse-papiers"
               >
                 <TerminalSquare className="h-3.5 w-3.5" />
-                cURL
+                Coller cURL
               </button>
-              <button
-                onClick={copyCurl}
-                className="flex h-7 items-center gap-1 rounded-md px-2 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
-                title="Copier la requête en commande cURL"
+              <select
+                value=""
+                onChange={(e) => {
+                  if (e.target.value) copySnippet(e.target.value as 'curl' | 'fetch' | 'axios' | 'httpie');
+                  e.target.value = '';
+                }}
+                className="h-7 rounded-md border border-border bg-transparent px-1.5 text-xs text-muted-foreground"
+                title="Copier la requête sous forme de code"
               >
-                Copier cURL
-              </button>
+                <option value="">Copier en…</option>
+                <option value="curl">cURL</option>
+                <option value="fetch">fetch</option>
+                <option value="axios">axios</option>
+                <option value="httpie">HTTPie</option>
+              </select>
               <button
                 onClick={() => setCollectionDialogId(null)}
                 className="flex h-7 items-center gap-1 rounded-md px-2 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
@@ -228,11 +238,16 @@ export default function ApiClient() {
                 Réponse
               </div>
               <ResponseView
+                request={state.draft}
                 response={response}
                 tests={tests}
                 extracted={extracted}
                 scriptError={scriptError}
                 loading={loading}
+                onApplyTests={(script) => {
+                  actions.patchDraft({ testScript: script });
+                  notify('Tests générés dans l’onglet Tests');
+                }}
               />
             </div>
           </div>

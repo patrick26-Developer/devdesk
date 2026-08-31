@@ -13,6 +13,7 @@ import { notify } from '@/lib/notify';
 
 import { actions, useApiClient } from '../store';
 import { parseSpec } from '../openapi';
+import { auditCollection, collectionToMarkdown } from '../assist';
 import type { Variable } from '../types';
 import KvEditor from './KvEditor';
 import AuthEditor from './AuthEditor';
@@ -26,8 +27,10 @@ export default function CollectionDialog({
 }) {
   const state = useApiClient();
   const collection = state.collections.find((c) => c.id === collectionId) ?? null;
-  const [tab, setTab] = useState<'settings' | 'import'>(collectionId ? 'settings' : 'import');
+  const [tab, setTab] = useState<'settings' | 'audit' | 'import'>(collectionId ? 'settings' : 'import');
   const [spec, setSpec] = useState('');
+
+  const audit = collection ? auditCollection(collection) : [];
 
   const importSpec = () => {
     try {
@@ -55,6 +58,19 @@ export default function CollectionDialog({
           >
             Paramètres
           </button>
+          {collection && (
+            <button
+              onClick={() => setTab('audit')}
+              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs ${tab === 'audit' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'}`}
+            >
+              Audit & doc
+              {audit.some((a) => a.level === 'warn') && (
+                <span className="rounded-full bg-amber-500/20 px-1.5 text-[10px] text-amber-500">
+                  {audit.filter((a) => a.level === 'warn').length}
+                </span>
+              )}
+            </button>
+          )}
           <button
             onClick={() => setTab('import')}
             className={`rounded-md px-2.5 py-1 text-xs ${tab === 'import' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'}`}
@@ -62,6 +78,48 @@ export default function CollectionDialog({
             Importer OpenAPI / Swagger
           </button>
         </div>
+
+        {tab === 'audit' && collection && (
+          <div className="max-h-[55vh] space-y-4 overflow-auto">
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-xs font-medium">Revue de la collection</p>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    navigator.clipboard.writeText(collectionToMarkdown(collection)).then(
+                      () => notify('Documentation Markdown copiée'),
+                      () => {}
+                    );
+                  }}
+                >
+                  Copier la doc Markdown
+                </Button>
+              </div>
+              {audit.length === 0 ? (
+                <p className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-xs text-emerald-600 dark:text-emerald-400">
+                  ✓ Rien à signaler.
+                </p>
+              ) : (
+                <ul className="space-y-1.5">
+                  {audit.map((a, i) => (
+                    <li
+                      key={i}
+                      className={`rounded-lg border px-3 py-2 text-xs ${
+                        a.level === 'warn'
+                          ? 'border-amber-500/20 bg-amber-500/5 text-amber-600 dark:text-amber-400'
+                          : 'border-border bg-muted/30 text-muted-foreground'
+                      }`}
+                    >
+                      <span className="font-medium">{a.requestName}</span> — {a.message}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        )}
 
         {tab === 'settings' && collection && (
           <div className="max-h-[55vh] space-y-4 overflow-auto">

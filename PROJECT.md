@@ -78,12 +78,47 @@ Objectif : développer et tester son propre backend sans revenir à Postman.
 | Phase | État | Contenu |
 |---|---|---|
 | **A — Cœur client + variables + tests + import** | ✅ | Request builder à onglets (Params/Headers/Auth/Body/Pré-script/Tests/Extraction), environnements + variables `{{VAR}}` + variables dynamiques `{{$guid}}`…, auth Bearer/Basic/API Key/hérité, corps JSON/texte/form/urlencoded/GraphQL, Response viewer (Pretty/Raw/Headers/Tests + filtre + statut/temps/taille), historique (100), collections (arbre, dossiers, enregistrer/renommer/dupliquer/supprimer), moteur de tests `pm`-like + `pm.expect`, extraction déclarative de variables → env, Collection Runner + rapport, import OpenAPI/Swagger (JSON ou YAML), persistance fichier (`userData/api-client.json`) |
-| **B — Confort** | ⬜ | Import/export cURL, onglets multiples, GraphQL variables, téléchargement de réponse, cookies |
-| **C — Avancé (plus tard)** | ⬜ | Mock server, monitors, WebSocket/gRPC, workflows visuels, assistant IA, documentation générée |
+| **B — Assistant local (gratuit, sans IA)** | ⬜ | Diagnostic heuristique des échecs (401/403/422/500/CORS/timeout → cause + correctif), génération d'assertions par inspection du JSON, audit de collection (tokens en dur, URLs absolues, requêtes sans test), doc Markdown générée depuis une collection, snippets `fetch` / `axios` / `HTTPie` |
+| **C — Confort** | ⬜ | Onglets multiples, cookies, téléchargement de réponse, GraphQL variables, diff de deux réponses |
+| **D — Avancé (plus tard, éventuellement payant)** | ⬜ | Couche LLM optionnelle « bring your own key », mock server, monitors, WebSocket/gRPC, workflows visuels |
 
 **Le blocage actuel de l'utilisateur** (copier-coller manuel du token entre `/login` et
 `/users`) est résolu dès la Phase A : environnement `Local`, variable `{{accessToken}}`,
 règle d'extraction post-réponse `accessToken ← $.accessToken`, auth `Bearer {{accessToken}}`.
+
+---
+
+## 4bis. Assistant — vision (perspective, pas d'urgence)
+
+### Principe
+
+- **Gratuit et local par défaut.** DevDesk ne paie aucun service. 80 % de la valeur d'un
+  « assistant » ne nécessite aucune IA : ce sont des heuristiques déterministes
+  (diagnostic d'erreur, génération d'assertions à partir de la forme d'une réponse,
+  audit par règles). → c'est la **Phase B**, implémentable immédiatement.
+- **Couche LLM optionnelle, « bring your own key ».** L'utilisateur colle sa propre clé
+  (Anthropic / OpenAI / Ollama local). Stockée en local, jamais transmise ailleurs.
+  Sans clé, l'assistant local suffit. → Phase D.
+- **Contextuel, pas conversationnel.** Pas de chatbot flottant. Des actions ciblées au
+  bon endroit : bouton « Diagnostiquer » dans le panneau réponse (visible si statut ≥ 400),
+  « Générer les tests », « Générer la doc » dans le menu collection.
+- **Transparent et suggéré.** Toute suggestion s'applique via un diff + bouton « Appliquer » ;
+  avant tout appel LLM, montrer ce qui serait envoyé et demander confirmation.
+
+### Rôle
+
+Supprimer le temps mort entre « j'ai une réponse ou une erreur » et « je sais quoi faire ».
+Il fait le travail mécanique de lecture et de rédaction, il ne décide pas à la place du dev.
+
+### Besoins couverts
+
+1. **Diagnostic d'échec** — 401/403/422/500/CORS/timeout : cause probable + correctif concret.
+2. **Génération de tests** — assertions `pm.test(...)` déduites d'une réponse réelle.
+3. **Génération de requêtes** — description en français → requête préremplie (via la spec OpenAPI importée).
+4. **Explication de réponse** — résumer un gros JSON, pointer les champs, repérer les incohérences.
+5. **Extraction / conversion** — « extrais l'id du premier élément » → règle d'extraction.
+6. **Documentation** — collection → doc Markdown (endpoint, params, exemples, codes d'erreur).
+7. **Revue de collection** — requêtes sans test, secrets en dur, URLs non variabilisées, doublons.
 
 ---
 

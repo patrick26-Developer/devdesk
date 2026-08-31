@@ -1,16 +1,19 @@
 import { useMemo, useState } from 'react';
-import { CheckCircle2, Clock3, Globe, HardDrive, XCircle } from 'lucide-react';
+import { CheckCircle2, Clock3, Globe, HardDrive, Sparkles, Wand2, XCircle } from 'lucide-react';
 
 import CopyButton from '@/components/CopyButton';
 import EmptyState from '@/components/tool/EmptyState';
-import type { ResponseData, TestResult } from '../types';
+import type { RequestDef, ResponseData, TestResult } from '../types';
+import { diagnose, generateTests } from '../assist';
 
 interface ResponseViewProps {
+  request: RequestDef;
   response: ResponseData | null;
   tests: TestResult[];
   extracted: Record<string, string>;
   scriptError: string | null;
   loading: boolean;
+  onApplyTests: (script: string) => void;
 }
 
 type Tab = 'pretty' | 'raw' | 'headers' | 'tests';
@@ -28,9 +31,23 @@ function statusColor(status: number | null): string {
   return 'text-red-500';
 }
 
-export default function ResponseView({ response, tests, extracted, scriptError, loading }: ResponseViewProps) {
+export default function ResponseView({
+  request,
+  response,
+  tests,
+  extracted,
+  scriptError,
+  loading,
+  onApplyTests,
+}: ResponseViewProps) {
   const [tab, setTab] = useState<Tab>('pretty');
   const [search, setSearch] = useState('');
+  const [showDiag, setShowDiag] = useState(true);
+
+  const diagnosis = useMemo(
+    () => (response && (response.error || (response.status ?? 0) >= 400) ? diagnose(request, response) : null),
+    [request, response]
+  );
 
   const pretty = useMemo(() => {
     if (!response?.body) return '';
@@ -107,10 +124,44 @@ export default function ResponseView({ response, tests, extracted, scriptError, 
         {response.redirected && response.finalUrl && (
           <span className="truncate text-muted-foreground">↪ {response.finalUrl}</span>
         )}
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-1">
+          {!response.error && (
+            <button
+              onClick={() => onApplyTests(generateTests(response))}
+              className="flex items-center gap-1 rounded-md px-2 py-1 text-[11px] text-muted-foreground hover:bg-accent hover:text-foreground"
+              title="Générer des assertions à partir de cette réponse"
+            >
+              <Wand2 className="h-3.5 w-3.5" />
+              Générer les tests
+            </button>
+          )}
           <CopyButton value={tab === 'raw' ? response.body : pretty} />
         </div>
       </div>
+
+      {diagnosis && showDiag && (
+        <div className="border-b border-border bg-amber-500/[0.06] px-4 py-3">
+          <div className="flex items-start gap-2">
+            <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold text-amber-600 dark:text-amber-400">{diagnosis.title}</p>
+                <button onClick={() => setShowDiag(false)} className="text-[11px] text-muted-foreground hover:text-foreground">
+                  masquer
+                </button>
+              </div>
+              <p className="mt-0.5 text-[11px] leading-5 text-muted-foreground">{diagnosis.cause}</p>
+              <ul className="mt-1.5 space-y-0.5">
+                {diagnosis.fixes.map((f, i) => (
+                  <li key={i} className="text-[11px] leading-5 text-foreground">
+                    → {f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
 
       {Object.keys(extracted).length > 0 && (
         <div className="border-b border-border bg-emerald-500/[0.06] px-4 py-2 text-[11px] text-emerald-600 dark:text-emerald-400">
