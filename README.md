@@ -31,8 +31,23 @@ Ce projet constitue également une base de référence pour une architecture Ele
 - Text Diff : comparaison de deux textes ligne à ligne avec surlignage des différences
 - Number Base Converter : conversion d'un entier entre binaire, octal, décimal et hexadécimal
 - Text & Line Utilities : tri, déduplication, nettoyage et comptage de lignes
+- JSON ↔ YAML : conversion bidirectionnelle entre JSON et YAML
+- Cron Explainer : traduction d'une expression cron en français + prochaines exécutions
+- JSON to TypeScript : génération d'interfaces TypeScript à partir d'un objet JSON
+- CSV ↔ JSON : conversion d'un CSV (avec en-tête) en tableau JSON et inversement
+- String Escaper : échappement / déséchappement pour JSON, HTML, URL, SQL, shell, regex
+- .env ↔ JSON : conversion d'un fichier .env en objet JSON et inversement
+- HTTP Status Codes : référence recherchable des codes de statut HTTP
+- Slug Generator : transformation d'un texte en slug d'URL (accents, séparateur, longueur)
 
-L'application inclut également une palette de commandes (Ctrl/Cmd+K), un système de favoris persistés localement regroupés par catégorie, une recherche d'outils, un thème clair / sombre / système, la persistance des saisies entre sessions, ainsi que des raccourcis clavier.
+L'application inclut également :
+
+- une **analyse du presse-papiers** sur l'accueil : DevDesk devine le type de contenu copié (JSON, JWT, couleur, timestamp, CSV, .env…) et ouvre l'outil adapté, déjà rempli ;
+- une **palette de commandes** (Ctrl/Cmd+K) : recherche floue, outils récents, navigation, thème ;
+- un système de **favoris** persistés localement, regroupés par catégorie dans la barre latérale ;
+- un thème **clair / sombre / système** (suit la préférence de l'OS) ;
+- la **persistance des saisies** entre sessions pour les outils à saisie longue ;
+- des raccourcis clavier (Ctrl+K palette, Ctrl+B barre latérale, Ctrl+F recherche).
 
 ## Stack technique
 

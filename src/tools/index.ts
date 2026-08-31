@@ -20,6 +20,14 @@ import {
   GitCompare,     // Diff
   Calculator,     // Number base converter
   ListOrdered,    // Text / line utilities
+  FileCode,       // JSON <-> YAML
+  CalendarClock,  // Cron explainer
+  Braces,         // JSON -> TypeScript
+  Table,          // CSV <-> JSON
+  Quote,          // String escaper
+  Cog,            // .env <-> JSON
+  List,           // HTTP status reference
+  Link,           // Slug generator
 } from 'lucide-react';
 
 // Import du type ComponentType depuis React pour typer les composants dynamiques
@@ -52,6 +60,14 @@ import ContrastChecker from './contrast/ContrastChecker';
 import DiffTool from './diff/DiffTool';
 import NumberBaseConverter from './number-base/NumberBaseConverter';
 import TextUtils from './text-utils/TextUtils';
+import JsonYaml from './json-yaml/JsonYaml';
+import CronExplainer from './cron/CronExplainer';
+import JsonToTs from './json-to-ts/JsonToTs';
+import CsvJson from './csv-json/CsvJson';
+import StringEscape from './string-escape/StringEscape';
+import DotenvJson from './dotenv-json/DotenvJson';
+import HttpStatus from './http-status/HttpStatus';
+import SlugGenerator from './slug/SlugGenerator';
 
 // Interface définissant la structure obligatoire de chaque outil du registre
 export interface Tool {
@@ -238,6 +254,78 @@ export const tools: Tool[] = [
     component: TextUtils,
     category: 'text',
     keywords: ['texte', 'lignes', 'trier', 'sort', 'dédupliquer', 'unique', 'compter', 'trim'],
+  },
+  {
+    id: 'json-yaml',
+    name: 'JSON ↔ YAML',
+    description: 'Convertit dans les deux sens entre JSON et YAML.',
+    icon: FileCode,
+    component: JsonYaml,
+    category: 'data',
+    keywords: ['json', 'yaml', 'yml', 'convertir', 'config', 'kubernetes', 'docker'],
+  },
+  {
+    id: 'cron',
+    name: 'Cron Explainer',
+    description: 'Explique une expression cron et liste ses prochaines exécutions.',
+    icon: CalendarClock,
+    component: CronExplainer,
+    category: 'convert',
+    keywords: ['cron', 'crontab', 'planification', 'schedule', 'tâche', 'périodique'],
+  },
+  {
+    id: 'json-to-ts',
+    name: 'JSON to TypeScript',
+    description: "Génère des interfaces TypeScript à partir d'un objet JSON.",
+    icon: Braces,
+    component: JsonToTs,
+    category: 'data',
+    keywords: ['json', 'typescript', 'ts', 'interface', 'type', 'modèle', 'api'],
+  },
+  {
+    id: 'csv-json',
+    name: 'CSV ↔ JSON',
+    description: 'Convertit un CSV en tableau JSON et inversement.',
+    icon: Table,
+    component: CsvJson,
+    category: 'data',
+    keywords: ['csv', 'json', 'tableau', 'tsv', 'export', 'données', 'colonnes'],
+  },
+  {
+    id: 'string-escape',
+    name: 'String Escaper',
+    description: 'Échappe / déséchappe pour JSON, HTML, URL, SQL, shell, regex.',
+    icon: Quote,
+    component: StringEscape,
+    category: 'encoding',
+    keywords: ['échapper', 'escape', 'unescape', 'json', 'html', 'sql', 'shell', 'regex'],
+  },
+  {
+    id: 'dotenv-json',
+    name: '.env ↔ JSON',
+    description: 'Convertit un fichier .env en JSON et inversement.',
+    icon: Cog,
+    component: DotenvJson,
+    category: 'data',
+    keywords: ['env', 'dotenv', 'json', 'variables', 'environnement', 'config', 'secrets'],
+  },
+  {
+    id: 'http-status',
+    name: 'HTTP Status Codes',
+    description: 'Référence recherchable des codes de statut HTTP et leur usage.',
+    icon: List,
+    component: HttpStatus,
+    category: 'web',
+    keywords: ['http', 'status', 'code', '404', '500', '301', 'référence', 'rest'],
+  },
+  {
+    id: 'slug',
+    name: 'Slug Generator',
+    description: "Transforme un texte en slug d'URL (accents, séparateur, longueur).",
+    icon: Link,
+    component: SlugGenerator,
+    category: 'text',
+    keywords: ['slug', 'url', 'permalink', 'seo', 'accents', 'kebab'],
   },
 ];
 

@@ -5,6 +5,7 @@ import ToolShell from '@/components/tool/ToolShell';
 import { Panel, PanelHeader } from '@/components/tool/Panel';
 import EmptyState from '@/components/tool/EmptyState';
 import CopyButton from '@/components/CopyButton';
+import PasteButton from '@/components/PasteButton';
 import { getTool } from '@/tools';
 import { AlertCircle, CheckCircle2, Code2, KeyRound, ShieldCheck } from 'lucide-react';
 
@@ -49,9 +50,10 @@ export default function JwtDecoder() {
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <label className="text-xs font-medium text-foreground">Token JWT</label>
-          <span className="font-mono text-[10px] text-muted-foreground">
-            HEADER.PAYLOAD.SIGNATURE
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-[10px] text-muted-foreground">HEADER.PAYLOAD.SIGNATURE</span>
+            <PasteButton onPaste={setToken} />
+          </div>
         </div>
         <Textarea
           value={token}

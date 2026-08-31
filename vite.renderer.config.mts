@@ -18,11 +18,13 @@ export default defineConfig({
   base: './',
   build: {
     // L'app est chargée en local (file://) : la taille de chunk n'a pas d'impact réseau.
-    chunkSizeWarningLimit: 900,
+    chunkSizeWarningLimit: 1600,
     rollupOptions: {
       output: {
         manualChunks: {
           react: ['react', 'react-dom'],
+          parsers: ['yaml', 'marked', 'dompurify', 'cronstrue'],
+          vendor: ['qrcode', 'cmdk', 'lucide-react'],
         },
       },
     },

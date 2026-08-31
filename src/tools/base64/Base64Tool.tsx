@@ -12,6 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import ToolShell from '@/components/tool/ToolShell';
 import { Panel, PanelHeader, PanelFooter } from '@/components/tool/Panel';
 import CopyButton from '@/components/CopyButton';
+import PasteButton from '@/components/PasteButton';
 import { getTool } from '@/tools';
 
 export default function Base64Tool() {
@@ -69,7 +70,11 @@ export default function Base64Tool() {
 
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-2">
         <Panel className="min-h-0">
-          <PanelHeader title="Entrée" subtitle="Texte ou chaîne Base64" />
+          <PanelHeader
+            title="Entrée"
+            subtitle="Texte ou chaîne Base64"
+            right={<PasteButton onPaste={(t) => { setInput(t); setError(null); }} />}
+          />
           <Textarea
             value={input}
             onChange={(e) => {

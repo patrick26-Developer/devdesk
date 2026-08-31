@@ -128,6 +128,54 @@ const GUIDE_CONTENT: Record<string, GuideEntry> = {
     besoin: "Nettoyer une liste collée depuis un fichier ou un tableur.",
     usage: "Colle une valeur par ligne puis clique sur une opération ; elle s'applique en place.",
   },
+
+  'json-yaml': {
+    role: "Convertit dans les deux sens entre JSON et YAML.",
+    besoin: "Passer d'un format de config à l'autre (Docker Compose, Kubernetes, GitHub Actions…).",
+    usage: "Colle l'un des formats ; utilise le bouton pour inverser le sens de conversion.",
+  },
+
+  cron: {
+    role: "Traduit une expression cron en phrase lisible et calcule ses prochaines exécutions.",
+    besoin: "Vérifier qu'une planification fait bien ce qu'on croit avant de la déployer.",
+    usage: "Saisis les 5 champs (minute heure jour mois jour-semaine) ou choisis un préréglage.",
+  },
+
+  'json-to-ts': {
+    role: "Génère des interfaces TypeScript à partir d'un objet JSON.",
+    besoin: "Typer rapidement une réponse d'API sans écrire les interfaces à la main.",
+    usage: "Colle un JSON représentatif ; ajuste le nom de l'interface racine si besoin.",
+  },
+
+  'csv-json': {
+    role: "Convertit un CSV (avec en-tête) en tableau JSON et inversement.",
+    besoin: "Manipuler des données exportées d'un tableur dans du code.",
+    usage: "Choisis le délimiteur, colle les données, bascule le sens de conversion au besoin.",
+  },
+
+  'string-escape': {
+    role: "Échappe ou déséchappe une chaîne pour JSON, HTML, URL, SQL, shell ou regex.",
+    besoin: "Insérer un texte dans un contexte qui a ses propres caractères spéciaux.",
+    usage: "Choisis la cible, colle ton texte, bascule entre Échapper et Déséchapper.",
+  },
+
+  'dotenv-json': {
+    role: "Convertit un fichier .env en objet JSON et inversement.",
+    besoin: "Importer une config d'environnement dans un outil qui attend du JSON (ou l'inverse).",
+    usage: "Colle le contenu ; les commentaires et guillemets du .env sont gérés.",
+  },
+
+  'http-status': {
+    role: "Référence recherchable des codes de statut HTTP et de leur signification.",
+    besoin: "Retrouver rapidement le sens d'un code et quand l'utiliser côté API.",
+    usage: "Tape un code, un nom ou un mot-clé pour filtrer la liste.",
+  },
+
+  slug: {
+    role: "Transforme un texte en slug d'URL : accents retirés, séparateur, longueur maximale.",
+    besoin: "Générer des permaliens propres et stables pour des articles ou des pages.",
+    usage: "Colle une ou plusieurs lignes ; règle le séparateur et la longueur.",
+  },
 };
 
 export default function Guide() {

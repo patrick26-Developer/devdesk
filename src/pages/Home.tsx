@@ -1,5 +1,6 @@
 import { tools, getToolChip } from '@/tools';
 import { Button } from '@/components/ui/button';
+import SmartPaste from '@/components/SmartPaste';
 import { ArrowRight, BookOpen, Command, Keyboard, PanelLeft, Sparkles, X } from 'lucide-react';
 import heroImage from '../../assets/branding/bg-home2.jpg';
 
@@ -61,6 +62,8 @@ export default function Home({ onSelectTool }: HomeProps) {
 
           <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/[0.08]" />
         </section>
+
+        <SmartPaste onSelectTool={onSelectTool} />
 
         {/* OUTILS POPULAIRES : grille qui passe de 1 à 2 à 3 colonnes selon la largeur */}
         <section>
