@@ -123,7 +123,7 @@ export function newId(prefix = 'id'): string {
   return `${prefix}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
-export function emptyRequest(name = 'Nouvelle requête'): RequestDef {
+export function emptyRequest(name = 'Requête'): RequestDef {
   return {
     name,
     method: 'GET',

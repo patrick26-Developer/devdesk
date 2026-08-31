@@ -187,7 +187,12 @@ export const actions = {
     });
   },
   newDraft() {
-    set((s) => ({ ...s, activeRequestId: null, draft: defaultState().draft }));
+    set((s) => ({ ...s, activeRequestId: null, draft: emptyRequest() }));
+  },
+
+  /** Crée une requête vide directement dans une collection / un dossier et l'ouvre. */
+  newRequestIn(collectionId: string, parentFolderId: string | null) {
+    return actions.saveRequestToCollection(collectionId, parentFolderId, emptyRequest());
   },
 
   replaceState(next: ApiClientState) {

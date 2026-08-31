@@ -17,6 +17,17 @@ import { newId } from './types';
 import RequestBuilder from './components/RequestBuilder';
 import ResponseView from './components/ResponseView';
 import WorkspacePanel from './components/WorkspacePanel';
+import InlineEdit from './components/InlineEdit';
+
+const METHOD_TEXT: Record<string, string> = {
+  GET: 'text-emerald-500',
+  POST: 'text-blue-500',
+  PUT: 'text-amber-500',
+  PATCH: 'text-violet-500',
+  DELETE: 'text-red-500',
+  HEAD: 'text-muted-foreground',
+  OPTIONS: 'text-muted-foreground',
+};
 import EnvDialog from './components/EnvDialog';
 import SaveDialog from './components/SaveDialog';
 import RunnerDialog from './components/RunnerDialog';
@@ -169,10 +180,20 @@ export default function ApiClient() {
         <div className="flex min-h-0 flex-1 flex-col">
           {/* Barre d'onglet requête */}
           <div className="flex shrink-0 items-center gap-2 border-b border-border px-3 py-1.5">
-            <span className="truncate text-xs font-medium">
-              {state.draft.name}
-              {dirty && <span className="ml-1 text-primary">•</span>}
+            <span className={`${METHOD_TEXT[state.draft.method] ?? ''} font-mono text-[10px] font-semibold`}>
+              {state.draft.method}
             </span>
+            <InlineEdit
+              value={state.draft.name}
+              placeholder="Requête"
+              className="text-xs font-medium"
+              inputClassName="text-xs font-medium"
+              onCommit={(name) => {
+                actions.patchDraft({ name });
+                if (state.activeRequestId) actions.renameItem(state.activeRequestId, name);
+              }}
+            />
+            {dirty && <span className="text-primary">•</span>}
             {parentCollection && (
               <span className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
                 {parentCollection.name}
