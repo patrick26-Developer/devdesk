@@ -5,6 +5,7 @@ import CopyButton from '@/components/CopyButton';
 import EmptyState from '@/components/tool/EmptyState';
 import type { RequestDef, ResponseData, TestResult } from '../types';
 import { diagnose, generateTests } from '../assist';
+import { useT } from '@/i18n';
 
 interface ResponseViewProps {
   request: RequestDef;
@@ -40,6 +41,7 @@ export default function ResponseView({
   loading,
   onApplyTests,
 }: ResponseViewProps) {
+  const t = useT();
   const [tab, setTab] = useState<Tab>('pretty');
   const [search, setSearch] = useState('');
   const [showDiag, setShowDiag] = useState(true);
@@ -71,7 +73,7 @@ export default function ResponseView({
     return (
       <div className="flex flex-1 flex-col items-center justify-center">
         <Clock3 className="h-6 w-6 animate-pulse text-muted-foreground" />
-        <p className="mt-2 text-xs text-muted-foreground">Requête en cours…</p>
+        <p className="mt-2 text-xs text-muted-foreground">{t('api.running')}</p>
       </div>
     );
   }
@@ -80,8 +82,8 @@ export default function ResponseView({
     return (
       <EmptyState
         icon={Globe}
-        title="Aucune réponse"
-        description="Configurez la requête puis cliquez sur Envoyer."
+        title={t('api.noResponse')}
+        description={t('api.noResponseSub')}
       />
     );
   }
@@ -96,7 +98,7 @@ export default function ResponseView({
         {response.error ? (
           <span className="flex items-center gap-1.5 font-semibold text-destructive">
             <XCircle className="h-4 w-4" />
-            Échec — {response.error}
+            {response.error}
           </span>
         ) : (
           <span className={`font-mono font-semibold ${statusColor(response.status)}`}>
@@ -129,10 +131,10 @@ export default function ResponseView({
             <button
               onClick={() => onApplyTests(generateTests(response))}
               className="flex items-center gap-1 rounded-md px-2 py-1 text-[11px] text-muted-foreground hover:bg-accent hover:text-foreground"
-              title="Générer des assertions à partir de cette réponse"
+              title={t('api.genTestsTooltip')}
             >
               <Wand2 className="h-3.5 w-3.5" />
-              Générer les tests
+              {t('api.genTests')}
             </button>
           )}
           <CopyButton value={tab === 'raw' ? response.body : pretty} />
@@ -147,7 +149,7 @@ export default function ResponseView({
               <div className="flex items-center justify-between">
                 <p className="text-xs font-semibold text-amber-600 dark:text-amber-400">{diagnosis.title}</p>
                 <button onClick={() => setShowDiag(false)} className="text-[11px] text-muted-foreground hover:text-foreground">
-                  masquer
+                  {t('api.diagHide')}
                 </button>
               </div>
               <p className="mt-0.5 text-[11px] leading-5 text-muted-foreground">{diagnosis.cause}</p>
@@ -165,7 +167,7 @@ export default function ResponseView({
 
       {Object.keys(extracted).length > 0 && (
         <div className="border-b border-border bg-emerald-500/[0.06] px-4 py-2 text-[11px] text-emerald-600 dark:text-emerald-400">
-          Variables mises à jour :{' '}
+          {t('api.varsUpdated')}{' '}
           {Object.entries(extracted).map(([k, v]) => (
             <code key={k} className="mx-1 rounded bg-emerald-500/10 px-1 font-mono">
               {k}={v.length > 24 ? v.slice(0, 24) + '…' : v}
@@ -176,28 +178,28 @@ export default function ResponseView({
 
       {scriptError && (
         <div className="border-b border-border bg-destructive/5 px-4 py-2 text-[11px] text-destructive">
-          Erreur de script : {scriptError}
+          {t('api.scriptError')} {scriptError}
         </div>
       )}
 
       {/* Onglets */}
       <div className="flex shrink-0 items-center gap-1 border-b border-border px-3 py-1.5">
-        {(['pretty', 'raw', 'headers', 'tests'] as Tab[]).map((t) => (
+        {(['pretty', 'raw', 'headers', 'tests'] as Tab[]).map((tb) => (
           <button
-            key={t}
-            onClick={() => setTab(t)}
+            key={tb}
+            onClick={() => setTab(tb)}
             className={`rounded-md px-2.5 py-1 text-xs font-medium capitalize transition-colors ${
-              tab === t ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'
+              tab === tb ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            {t === 'headers' ? `Headers (${headerEntries.length})` : t === 'tests' ? `Tests (${tests.length})` : t}
+            {tb === 'headers' ? `Headers (${headerEntries.length})` : tb === 'tests' ? `Tests (${tests.length})` : tb}
           </button>
         ))}
         {(tab === 'pretty' || tab === 'raw') && (
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Filtrer…"
+            placeholder={t('api.resp.filter')}
             className="ml-auto h-7 w-40 rounded-md border border-input bg-transparent px-2 text-xs outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
           />
         )}
@@ -220,7 +222,7 @@ export default function ResponseView({
         )}
         {tab === 'tests' && (
           <div className="divide-y divide-border">
-            {tests.length === 0 && <p className="p-4 text-xs text-muted-foreground">Aucun test défini.</p>}
+            {tests.length === 0 && <p className="p-4 text-xs text-muted-foreground">{t('api.resp.noTests')}</p>}
             {tests.map((t, i) => (
               <div key={i} className="flex items-start gap-2 px-4 py-2.5 text-xs">
                 {t.passed ? (

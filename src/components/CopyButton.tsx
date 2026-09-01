@@ -8,6 +8,7 @@ import { Check, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { notify } from '@/lib/notify';
+import { useT } from '@/i18n';
 
 interface CopyButtonProps {
   value: string;
@@ -28,16 +29,18 @@ interface CopyButtonProps {
 export default function CopyButton({
   value,
   label,
-  copiedLabel = 'Copié',
+  copiedLabel,
   disabled,
   variant = 'ghost',
   size,
   className,
-  toastMessage = 'Copié dans le presse-papiers',
+  toastMessage,
   onCopied,
 }: CopyButtonProps) {
+  const t = useT();
   const [copied, setCopied] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resolvedCopiedLabel = copiedLabel ?? t('common.copied');
 
   const copy = useCallback(async () => {
     if (!value) return;
@@ -50,11 +53,11 @@ export default function CopyButton({
 
     setCopied(true);
     onCopied?.(value);
-    if (toastMessage !== false) notify(toastMessage);
+    if (toastMessage !== false) notify(toastMessage ?? t('common.copiedClipboard'));
 
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => setCopied(false), 1500);
-  }, [value, onCopied, toastMessage]);
+  }, [value, onCopied, toastMessage, t]);
 
   const iconOnly = !label;
   const resolvedSize = size ?? (iconOnly ? 'icon-sm' : 'sm');
@@ -66,7 +69,7 @@ export default function CopyButton({
       size={resolvedSize}
       onClick={copy}
       disabled={disabled || !value}
-      aria-label={label ? undefined : copied ? copiedLabel : 'Copier'}
+      aria-label={label ? undefined : copied ? resolvedCopiedLabel : t('common.copy')}
       className={cn('gap-1.5', className)}
     >
       {copied ? (
@@ -74,7 +77,7 @@ export default function CopyButton({
       ) : (
         <Copy className="h-3.5 w-3.5" />
       )}
-      {label ? <span>{copied ? copiedLabel : label}</span> : null}
+      {label ? <span>{copied ? resolvedCopiedLabel : label}</span> : null}
     </Button>
   );
 }

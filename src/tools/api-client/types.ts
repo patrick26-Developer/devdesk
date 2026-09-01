@@ -123,7 +123,7 @@ export function newId(prefix = 'id'): string {
   return `${prefix}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
-export function emptyRequest(name = 'Requête'): RequestDef {
+export function emptyRequest(name = ''): RequestDef {
   return {
     name,
     method: 'GET',
@@ -155,7 +155,7 @@ export function defaultState(): ApiClientState {
     collections: [],
     history: [],
     draft: {
-      ...emptyRequest('Requête'),
+      ...emptyRequest('Login'),
       method: 'POST',
       url: '{{baseUrl}}/api/auth/login',
       headers: [{ id: newId('h'), key: 'Content-Type', value: 'application/json', enabled: true }],
@@ -168,7 +168,7 @@ export function defaultState(): ApiClientState {
         { id: newId('x'), enabled: true, source: 'body', path: 'accessToken', target: 'accessToken' },
       ],
       testScript:
-        "pm.test('statut 200', () => pm.expect(pm.response.code).to.equal(200));\npm.test('accessToken présent', () => pm.expect(pm.response.json().accessToken).to.be.a('string'));",
+        "pm.test('status 200', () => pm.expect(pm.response.code).to.equal(200));\npm.test('accessToken is present', () => pm.expect(pm.response.json().accessToken).to.be.a('string'));",
     },
     activeRequestId: null,
   };

@@ -1,12 +1,13 @@
 import { Input } from '@/components/ui/input';
 import type { AuthConfig } from '../types';
+import { useT } from '@/i18n';
 
-const TYPES: { value: AuthConfig['type']; label: string }[] = [
-  { value: 'inherit', label: 'Hériter de la collection' },
-  { value: 'none', label: 'Aucune' },
-  { value: 'bearer', label: 'Bearer Token' },
-  { value: 'basic', label: 'Basic Auth' },
-  { value: 'apikey', label: 'API Key' },
+const TYPE_KEYS: { value: AuthConfig['type']; key: string }[] = [
+  { value: 'inherit', key: 'api.auth.inherit' },
+  { value: 'none', key: 'api.auth.none' },
+  { value: 'bearer', key: 'api.auth.token' },
+  { value: 'basic', key: 'api.auth.token' },
+  { value: 'apikey', key: 'api.auth.token' },
 ];
 
 interface AuthEditorProps {
@@ -17,7 +18,9 @@ interface AuthEditorProps {
 }
 
 export default function AuthEditor({ auth, onChange, allowInherit = true }: AuthEditorProps) {
-  const types = allowInherit ? TYPES : TYPES.filter((t) => t.value !== 'inherit');
+  const t = useT();
+  const LABELS: Record<AuthConfig['type'], string> = { inherit: t('api.auth.inherit'), none: t('api.auth.none'), bearer: 'Bearer Token', basic: 'Basic Auth', apikey: 'API Key' };
+  const types = (allowInherit ? TYPE_KEYS : TYPE_KEYS.filter((x) => x.value !== 'inherit'));
 
   const setType = (type: AuthConfig['type']) => {
     switch (type) {
@@ -38,24 +41,24 @@ export default function AuthEditor({ auth, onChange, allowInherit = true }: Auth
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap gap-1.5">
-        {types.map((t) => (
+        {types.map((ty) => (
           <button
-            key={t.value}
-            onClick={() => setType(t.value)}
+            key={ty.value}
+            onClick={() => setType(ty.value)}
             className={`rounded-md border px-2.5 py-1 text-xs ${
-              auth.type === t.value
+              auth.type === ty.value
                 ? 'border-primary/30 bg-primary/10 text-primary'
                 : 'border-border text-muted-foreground hover:text-foreground'
             }`}
           >
-            {t.label}
+            {LABELS[ty.value]}
           </button>
         ))}
       </div>
 
       {auth.type === 'bearer' && (
         <label className="block">
-          <span className="mb-1 block text-xs font-medium">Token</span>
+          <span className="mb-1 block text-xs font-medium">{t('api.auth.token')}</span>
           <Input
             value={auth.token}
             onChange={(e) => onChange({ ...auth, token: e.target.value })}
@@ -68,11 +71,11 @@ export default function AuthEditor({ auth, onChange, allowInherit = true }: Auth
       {auth.type === 'basic' && (
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <label className="block">
-            <span className="mb-1 block text-xs font-medium">Utilisateur</span>
+            <span className="mb-1 block text-xs font-medium">{t('api.auth.user')}</span>
             <Input value={auth.username} onChange={(e) => onChange({ ...auth, username: e.target.value })} className="h-9 font-mono text-xs" />
           </label>
           <label className="block">
-            <span className="mb-1 block text-xs font-medium">Mot de passe</span>
+            <span className="mb-1 block text-xs font-medium">{t('api.auth.password')}</span>
             <Input value={auth.password} onChange={(e) => onChange({ ...auth, password: e.target.value })} className="h-9 font-mono text-xs" />
           </label>
         </div>
@@ -81,22 +84,22 @@ export default function AuthEditor({ auth, onChange, allowInherit = true }: Auth
       {auth.type === 'apikey' && (
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           <label className="block">
-            <span className="mb-1 block text-xs font-medium">Nom</span>
+            <span className="mb-1 block text-xs font-medium">{t('api.auth.name')}</span>
             <Input value={auth.key} onChange={(e) => onChange({ ...auth, key: e.target.value })} placeholder="X-API-Key" className="h-9 font-mono text-xs" />
           </label>
           <label className="block">
-            <span className="mb-1 block text-xs font-medium">Valeur</span>
+            <span className="mb-1 block text-xs font-medium">{t('api.auth.value')}</span>
             <Input value={auth.value} onChange={(e) => onChange({ ...auth, value: e.target.value })} className="h-9 font-mono text-xs" />
           </label>
           <label className="block">
-            <span className="mb-1 block text-xs font-medium">Emplacement</span>
+            <span className="mb-1 block text-xs font-medium">{t('api.auth.location')}</span>
             <select
               value={auth.in}
               onChange={(e) => onChange({ ...auth, in: e.target.value as 'header' | 'query' })}
               className="h-9 w-full rounded-lg border border-input bg-transparent px-2 text-xs"
             >
-              <option value="header">En-tête</option>
-              <option value="query">Paramètre d'URL</option>
+              <option value="header">{t('api.auth.inHeader')}</option>
+              <option value="query">{t('api.auth.inQuery')}</option>
             </select>
           </label>
         </div>
@@ -104,7 +107,7 @@ export default function AuthEditor({ auth, onChange, allowInherit = true }: Auth
 
       {auth.type === 'inherit' && (
         <p className="text-xs text-muted-foreground">
-          La requête utilise l'authentification définie au niveau de sa collection.
+          {t('api.auth.inheritMsg')}
         </p>
       )}
     </div>

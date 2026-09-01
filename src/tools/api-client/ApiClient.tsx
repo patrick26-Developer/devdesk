@@ -4,6 +4,7 @@ import { FileDown, ListChecks, Play, Plus, Settings2, TerminalSquare } from 'luc
 import ToolShell from '@/components/tool/ToolShell';
 import { Button } from '@/components/ui/button';
 import { notify } from '@/lib/notify';
+import { useT } from '@/i18n';
 import { getTool } from '@/tools';
 import { parseCurl, toCurl } from './curl';
 import { toAxios, toFetch, toHttpie } from './snippets';
@@ -35,6 +36,7 @@ import CollectionDialog from './components/CollectionDialog';
 
 export default function ApiClient() {
   const tool = getTool('api-tester')!;
+  const t = useT();
   const state = useApiClient();
 
   const [loading, setLoading] = useState(false);
@@ -101,7 +103,7 @@ export default function ApiClient() {
         actions.updateRequestInCollection(state.activeRequestId, state.draft);
       }
     } catch (e) {
-      notify('Requête impossible', { type: 'error', description: (e as Error).message });
+      notify(t('api.reqFail'), { type: 'error', description: (e as Error).message });
     } finally {
       setLoading(false);
     }
@@ -110,7 +112,7 @@ export default function ApiClient() {
   const save = () => {
     if (state.activeRequestId) {
       actions.updateRequestInCollection(state.activeRequestId, state.draft);
-      notify('Requête enregistrée');
+      notify(t('api.reqSaved'));
     } else {
       setSaveOpen(true);
     }
@@ -120,9 +122,9 @@ export default function ApiClient() {
     try {
       const text = await navigator.clipboard.readText();
       actions.setDraft(parseCurl(text));
-      notify('Requête importée depuis cURL');
+      notify(t('api.curlImported'));
     } catch (e) {
-      notify('Import cURL impossible', { type: 'error', description: (e as Error).message });
+      notify(t('api.curlFail'), { type: 'error', description: (e as Error).message });
     }
   };
 
@@ -130,7 +132,7 @@ export default function ApiClient() {
     const gen = { curl: toCurl, fetch: toFetch, axios: toAxios, httpie: toHttpie }[kind];
     try {
       await navigator.clipboard.writeText(gen(state.draft));
-      notify(`Snippet ${kind} copié`);
+      notify(t('api.snippetCopied', { kind }));
     } catch {
       /* presse-papiers indisponible */
     }
@@ -146,16 +148,16 @@ export default function ApiClient() {
 
   return (
     <ToolShell
-      tool={{ ...tool, name: 'API Client', description: 'Environnements, collections, variables, tests — votre atelier d’API.' }}
+      tool={{ ...tool, name: t('api.title'), description: t('api.subtitle') }}
       actions={
         <div className="flex items-center gap-2">
           <select
             value={state.activeEnvId ?? ''}
             onChange={(e) => actions.setActiveEnv(e.target.value || null)}
             className="h-8 rounded-lg border border-input bg-transparent px-2 text-xs"
-            title="Environnement actif"
+            title={t('api.env.active')}
           >
-            <option value="">Aucun environnement</option>
+            <option value="">{t('api.env.none')}</option>
             {state.environments.map((e) => (
               <option key={e.id} value={e.id}>
                 {e.name}
@@ -164,11 +166,11 @@ export default function ApiClient() {
           </select>
           <Button variant="ghost" size="sm" onClick={() => setEnvOpen(true)} className="gap-1.5">
             <Settings2 className="h-3.5 w-3.5" />
-            Variables
+            {t('api.variables')}
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setRunnerOpen(true)} className="gap-1.5">
             <Play className="h-3.5 w-3.5" />
-            Runner
+            {t('api.runner')}
           </Button>
         </div>
       }
@@ -185,7 +187,7 @@ export default function ApiClient() {
             </span>
             <InlineEdit
               value={state.draft.name}
-              placeholder="Requête"
+              placeholder={t('api.request')}
               className="text-xs font-medium"
               inputClassName="text-xs font-medium"
               onCommit={(name) => {
@@ -203,18 +205,18 @@ export default function ApiClient() {
               <button
                 onClick={() => actions.newDraft()}
                 className="flex h-7 items-center gap-1 rounded-md px-2 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
-                title="Nouvelle requête"
+                title={t('api.newRequestTitle')}
               >
                 <Plus className="h-3.5 w-3.5" />
-                Nouvelle
+                {t('api.newRequest')}
               </button>
               <button
                 onClick={importCurl}
                 className="flex h-7 items-center gap-1 rounded-md px-2 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
-                title="Coller une commande cURL depuis le presse-papiers"
+                title={t('api.pasteCurlTitle')}
               >
                 <TerminalSquare className="h-3.5 w-3.5" />
-                Coller cURL
+                {t('api.pasteCurl')}
               </button>
               <select
                 value=""
@@ -223,9 +225,9 @@ export default function ApiClient() {
                   e.target.value = '';
                 }}
                 className="h-7 rounded-md border border-border bg-transparent px-1.5 text-xs text-muted-foreground"
-                title="Copier la requête sous forme de code"
+                title={t('api.copyAsTitle')}
               >
-                <option value="">Copier en…</option>
+                <option value="">{t('api.copyAs')}</option>
                 <option value="curl">cURL</option>
                 <option value="fetch">fetch</option>
                 <option value="axios">axios</option>
@@ -234,10 +236,10 @@ export default function ApiClient() {
               <button
                 onClick={() => setCollectionDialogId(null)}
                 className="flex h-7 items-center gap-1 rounded-md px-2 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
-                title="Importer OpenAPI"
+                title={t('api.importTitle')}
               >
                 <FileDown className="h-3.5 w-3.5" />
-                OpenAPI
+                {t('api.import')}
               </button>
             </div>
           </div>
@@ -256,7 +258,7 @@ export default function ApiClient() {
             <div className="flex min-h-0 flex-1 flex-col">
               <div className="flex shrink-0 items-center gap-2 border-b border-border px-4 py-2 text-xs font-medium">
                 <ListChecks className="h-3.5 w-3.5 text-muted-foreground" />
-                Réponse
+                {t('api.response')}
               </div>
               <ResponseView
                 request={state.draft}
@@ -267,7 +269,7 @@ export default function ApiClient() {
                 loading={loading}
                 onApplyTests={(script) => {
                   actions.patchDraft({ testScript: script });
-                  notify('Tests générés dans l’onglet Tests');
+                  notify(t('api.genTestsDone'));
                 }}
               />
             </div>

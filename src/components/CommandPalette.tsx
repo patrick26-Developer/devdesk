@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/command';
 import { tools, getCategory } from '@/tools';
 import { useTheme } from '@/hooks/useTheme';
+import { useT } from '@/i18n';
 import { BookOpen, Home, Info, Monitor, Moon, Settings, Sun } from 'lucide-react';
 
 const RECENT_KEY = 'devdesk-recent-tools';
@@ -45,14 +46,15 @@ interface CommandPaletteProps {
 }
 
 const PAGES = [
-  { id: 'home', label: 'Accueil', icon: Home },
-  { id: 'guide', label: 'Guide', icon: BookOpen },
-  { id: 'settings', label: 'Paramètres', icon: Settings },
-  { id: 'about', label: 'À propos', icon: Info },
+  { id: 'home', key: 'nav.home', icon: Home },
+  { id: 'guide', key: 'nav.guide', icon: BookOpen },
+  { id: 'settings', key: 'nav.settings', icon: Settings },
+  { id: 'about', key: 'nav.about', icon: Info },
 ];
 
 export default function CommandPalette({ open, onOpenChange, onNavigate }: CommandPaletteProps) {
   const { setTheme } = useTheme();
+  const t = useT();
 
   const recentTools = useMemo(() => {
     if (!open) return [];
@@ -70,8 +72,8 @@ export default function CommandPalette({ open, onOpenChange, onNavigate }: Comma
     <CommandDialog
       open={open}
       onOpenChange={onOpenChange}
-      title="Palette de commandes"
-      description="Rechercher un outil ou une commande"
+      title={t('palette.title')}
+      description={t('palette.desc')}
       className="sm:max-w-lg"
     >
       <Command
@@ -80,13 +82,13 @@ export default function CommandPalette({ open, onOpenChange, onNavigate }: Comma
           if (e.key === 'Escape') onOpenChange(false);
         }}
       >
-        <CommandInput placeholder="Rechercher un outil, une page, un thème..." />
+        <CommandInput placeholder={t('palette.placeholder')} />
         <CommandList>
-        <CommandEmpty>Aucun résultat.</CommandEmpty>
+        <CommandEmpty>{t('palette.empty')}</CommandEmpty>
 
         {recentTools.length > 0 && (
           <>
-            <CommandGroup heading="Récents">
+            <CommandGroup heading={t('palette.recent')}>
               {recentTools.map((tool) => {
                 const Icon = tool.icon;
                 return (
@@ -105,18 +107,18 @@ export default function CommandPalette({ open, onOpenChange, onNavigate }: Comma
           </>
         )}
 
-        <CommandGroup heading="Navigation">
-          {PAGES.map(({ id, label, icon: Icon }) => (
-            <CommandItem key={id} value={`page ${label}`} onSelect={() => go(id)}>
+        <CommandGroup heading={t('palette.navigation')}>
+          {PAGES.map(({ id, key, icon: Icon }) => (
+            <CommandItem key={id} value={`page ${t(key)}`} onSelect={() => go(id)}>
               <Icon />
-              {label}
+              {t(key)}
             </CommandItem>
           ))}
         </CommandGroup>
 
         <CommandSeparator />
 
-        <CommandGroup heading="Outils">
+        <CommandGroup heading={t('palette.tools')}>
           {tools.map((tool) => {
             const Icon = tool.icon;
             return (
@@ -134,18 +136,18 @@ export default function CommandPalette({ open, onOpenChange, onNavigate }: Comma
 
         <CommandSeparator />
 
-        <CommandGroup heading="Thème">
-          <CommandItem value="thème clair light" onSelect={() => { setTheme('light'); onOpenChange(false); }}>
+        <CommandGroup heading={t('palette.themeGroup')}>
+          <CommandItem value="theme light clair" onSelect={() => { setTheme('light'); onOpenChange(false); }}>
             <Sun />
-            Thème clair
+            {t('palette.themeLight')}
           </CommandItem>
-          <CommandItem value="thème sombre dark" onSelect={() => { setTheme('dark'); onOpenChange(false); }}>
+          <CommandItem value="theme dark sombre" onSelect={() => { setTheme('dark'); onOpenChange(false); }}>
             <Moon />
-            Thème sombre
+            {t('palette.themeDark')}
           </CommandItem>
-          <CommandItem value="thème système system" onSelect={() => { setTheme('system'); onOpenChange(false); }}>
+          <CommandItem value="theme system système" onSelect={() => { setTheme('system'); onOpenChange(false); }}>
             <Monitor />
-            Thème système
+            {t('palette.themeSystem')}
           </CommandItem>
         </CommandGroup>
         </CommandList>

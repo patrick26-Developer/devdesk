@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { tools } from '@/tools';
 import PageHeader from '@/components/PageHeader';
+import { useT } from '@/i18n';
 // Import ES du logo réel : garantit un chemin correct en dev ET en production (voir explication plus haut)
 import logoSrc from '../../assets/branding/devdesk-icon.png';
 import {
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 
 export default function About() {
+  const t = useT();
   const [version, setVersion] = useState('');
 
   useEffect(() => {
@@ -25,9 +27,9 @@ export default function About() {
       <div className="mx-auto max-w-5xl space-y-8">
 
         <PageHeader
-          eyebrow="À propos"
+          eyebrow={t('about.eyebrow')}
           title="DevDesk"
-          description="Une boîte à outils développeur moderne, locale et pensée pour centraliser les petites tâches techniques du quotidien."
+          description={t('about.desc')}
         />
 
         {/* Hero */}
@@ -53,12 +55,12 @@ export default function About() {
                 </div>
 
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Developer toolbox — local first.
+                  {t('about.tagline')}
                 </p>
 
                 <div className="mt-3 flex items-center gap-2 text-xs text-emerald-500">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  Fonctionnement local
+                  {t('about.localRun')}
                 </div>
               </div>
             </div>
@@ -68,10 +70,10 @@ export default function About() {
 
               <div>
                 <p className="text-xs font-medium">
-                  Données locales
+                  {t('about.localData')}
                 </p>
                 <p className="text-[11px] text-muted-foreground">
-                  Vos données restent sur votre machine
+                  {t('about.localDataSub')}
                 </p>
               </div>
             </div>
@@ -90,7 +92,7 @@ export default function About() {
             </p>
 
             <p className="mt-1 text-xs text-muted-foreground">
-              Outils intégrés
+              {t('about.toolsCount')}
             </p>
           </div>
 
@@ -104,7 +106,7 @@ export default function About() {
             </p>
 
             <p className="mt-1 text-xs text-muted-foreground">
-              Application desktop
+              {t('about.desktopApp')}
             </p>
           </div>
 
@@ -118,7 +120,7 @@ export default function About() {
             </p>
 
             <p className="mt-1 text-xs text-muted-foreground">
-              Traitement des données
+              {t('about.dataProcessing')}
             </p>
           </div>
         </section>
@@ -132,26 +134,21 @@ export default function About() {
 
             <div>
               <h2 className="text-sm font-semibold">
-                Pourquoi DevDesk ?
+                {t('about.why')}
               </h2>
 
               <p className="text-xs text-muted-foreground">
-                Une approche simple pour les tâches répétitives
+                {t('about.whySub')}
               </p>
             </div>
           </div>
 
           <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
-            DevDesk regroupe les utilitaires que les développeurs utilisent
-            régulièrement : formatage JSON, encodage Base64, génération
-            d'UUID, test de regex, décodage JWT, hash, QR codes, requêtes HTTP
-            et bien plus encore.
+            {t('about.whyText1')}
           </p>
 
           <p className="mt-4 max-w-3xl text-sm leading-7 text-muted-foreground">
-            L'objectif est simple : éviter de multiplier les onglets, les
-            services en ligne et les petits scripts pour accomplir des tâches
-            techniques rapides.
+            {t('about.whyText2')}
           </p>
         </section>
 
@@ -159,11 +156,11 @@ export default function About() {
         <section>
           <div className="mb-4">
             <h2 className="text-sm font-semibold">
-              Outils disponibles
+              {t('about.toolsAvailable')}
             </h2>
 
             <p className="mt-1 text-xs text-muted-foreground">
-              L'ensemble des utilitaires actuellement disponibles dans DevDesk.
+              {t('about.toolsAvailableSub')}
             </p>
           </div>
 
@@ -211,11 +208,11 @@ export default function About() {
 
             <div>
               <h2 className="text-sm font-semibold">
-                Stack technique
+                {t('about.stack')}
               </h2>
 
               <p className="text-xs text-muted-foreground">
-                Technologies utilisées pour construire DevDesk
+                {t('about.stackSub')}
               </p>
             </div>
           </div>
@@ -250,7 +247,7 @@ export default function About() {
         <section className="flex flex-col gap-4 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-xs font-medium">
-              Développé par Patrick De Grâce MAKOSSO BAYONNE
+              {t('about.by')}
             </p>
 
             <p className="mt-1 text-[11px] text-muted-foreground">
@@ -273,7 +270,7 @@ export default function About() {
             "
           >
             <ExternalLink className="h-3.5 w-3.5" />
-            Code source
+            {t('about.source')}
           </a>
         </section>
       </div>

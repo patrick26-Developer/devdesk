@@ -13,6 +13,7 @@ import { actions, flattenRequests, useApiClient } from '../store';
 import { runRequest } from '../runtime';
 import { toScope } from '../vars';
 import type { TestResult } from '../types';
+import { useT } from '@/i18n';
 
 interface RunRow {
   id: string;
@@ -26,6 +27,7 @@ interface RunRow {
 
 export default function RunnerDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
   const state = useApiClient();
+  const t = useT();
   const [collectionId, setCollectionId] = useState<string | null>(state.collections[0]?.id ?? null);
   const [rows, setRows] = useState<RunRow[]>([]);
   const [running, setRunning] = useState(false);
@@ -85,9 +87,9 @@ export default function RunnerDialog({ open, onOpenChange }: { open: boolean; on
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Exécuter une collection</DialogTitle>
+          <DialogTitle>{t('api.runnerTitle')}</DialogTitle>
           <DialogDescription>
-            Les requêtes s'exécutent dans l'ordre ; les variables extraites circulent d'une requête à l'autre.
+            {t('api.runnerDesc')}
           </DialogDescription>
         </DialogHeader>
 
@@ -100,7 +102,7 @@ export default function RunnerDialog({ open, onOpenChange }: { open: boolean; on
             }}
             className="h-9 flex-1 rounded-lg border border-input bg-transparent px-2 text-xs"
           >
-            <option value="">— choisir une collection —</option>
+            <option value="">—</option>
             {state.collections.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name} ({flattenRequests(c.items).length})
@@ -109,22 +111,22 @@ export default function RunnerDialog({ open, onOpenChange }: { open: boolean; on
           </select>
           <Button onClick={run} disabled={running || !collection || requests.length === 0} size="sm" className="gap-2">
             {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-            Lancer
+            {t('api.runnerRun')}
           </Button>
         </div>
 
         {done && (
           <div className="flex items-center gap-4 rounded-lg border border-border bg-muted/30 px-4 py-2.5 text-xs tabular-nums">
-            <span>Requêtes : {rows.length}</span>
-            <span className="text-emerald-500">{passedTests} tests OK</span>
-            <span className="text-red-500">{totalTests - passedTests} échecs</span>
+            <span>{t('api.runnerRequests', { n: rows.length })}</span>
+            <span className="text-emerald-500">{t('api.runnerTestsOk', { n: passedTests })}</span>
+            <span className="text-red-500">{t('api.runnerTestsFail', { n: totalTests - passedTests })}</span>
           </div>
         )}
 
         <div className="max-h-[45vh] overflow-auto rounded-lg border border-border">
           {rows.length === 0 ? (
             <p className="p-4 text-xs text-muted-foreground">
-              {collection ? `${requests.length} requête(s) prêtes.` : 'Choisis une collection.'}
+              {collection ? t('api.runnerReady', { n: requests.length }) : t('api.runnerChoose')}
             </p>
           ) : (
             <div className="divide-y divide-border">

@@ -12,6 +12,7 @@ export type CategoryKey =
 
 export interface Category {
   key: CategoryKey;
+  /** Libellé français (repli). Pour l'affichage, préférer t(`cat.${key}`). */
   label: string;
   // Classes Tailwind du chip d'icône affiché dans l'en-tête de l'outil (fond + bordure + texte)
   chip: string;

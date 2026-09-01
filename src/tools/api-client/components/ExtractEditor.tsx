@@ -1,6 +1,7 @@
 import { Plus, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { newId, type ExtractRule } from '../types';
+import { useT } from '@/i18n';
 
 interface ExtractEditorProps {
   rules: ExtractRule[];
@@ -8,6 +9,7 @@ interface ExtractEditorProps {
 }
 
 export default function ExtractEditor({ rules, onChange }: ExtractEditorProps) {
+  const t = useT();
   const update = (id: string, patch: Partial<ExtractRule>) =>
     onChange(rules.map((r) => (r.id === id ? { ...r, ...patch } : r)));
   const add = () =>
@@ -15,11 +17,7 @@ export default function ExtractEditor({ rules, onChange }: ExtractEditorProps) {
 
   return (
     <div className="space-y-3">
-      <p className="text-xs leading-5 text-muted-foreground">
-        Après la réponse, ces règles écrivent des valeurs dans l'environnement actif. Le chemin
-        pour le corps est de la forme <code className="rounded bg-muted px-1 font-mono">data.token</code> ;
-        pour un en-tête, c'est son nom.
-      </p>
+      <p className="text-xs leading-5 text-muted-foreground">{t('api.extractHint')}</p>
 
       {rules.map((rule) => (
         <div key={rule.id} className="flex flex-wrap items-center gap-1.5">
@@ -34,8 +32,8 @@ export default function ExtractEditor({ rules, onChange }: ExtractEditorProps) {
             onChange={(e) => update(rule.id, { source: e.target.value as 'body' | 'header' })}
             className="h-8 rounded-lg border border-input bg-transparent px-2 text-xs"
           >
-            <option value="body">Corps</option>
-            <option value="header">En-tête</option>
+            <option value="body">Body</option>
+            <option value="header">Header</option>
           </select>
           <Input
             value={rule.path}
@@ -53,7 +51,7 @@ export default function ExtractEditor({ rules, onChange }: ExtractEditorProps) {
           <button
             onClick={() => onChange(rules.filter((r) => r.id !== rule.id))}
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-            aria-label="Supprimer"
+            aria-label={t('common.delete')}
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>
@@ -65,7 +63,7 @@ export default function ExtractEditor({ rules, onChange }: ExtractEditorProps) {
         className="inline-flex items-center gap-1.5 rounded-md border border-dashed border-border px-2.5 py-1 text-xs text-muted-foreground hover:border-primary/30 hover:text-foreground"
       >
         <Plus className="h-3.5 w-3.5" />
-        Ajouter une règle
+        {t('api.addRule')}
       </button>
     </div>
   );

@@ -8,6 +8,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import Logo from '@/components/Logo';
 import CommandPalette, { pushRecentTool } from '@/components/CommandPalette';
 import { Kbd } from '@/components/ui/kbd';
+import { useT } from '@/i18n';
 import { tools } from '@/tools';
 import { Search } from 'lucide-react';
 
@@ -22,6 +23,7 @@ function readLastTool(): string {
 }
 
 export default function App() {
+  const t = useT();
   const [activeToolId, setActiveToolId] = useState(readLastTool);
   // Contrôle l'affichage de la sidebar en mode fenêtre étroite (drawer). Sans effet sur grand écran.
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -92,7 +94,7 @@ export default function App() {
             className="mx-auto flex h-8 w-full min-w-0 max-w-md items-center gap-2 rounded-lg border border-border bg-card px-3 text-xs text-muted-foreground transition-colors [-webkit-app-region:no-drag] hover:bg-accent hover:text-foreground"
           >
             <Search className="h-3.5 w-3.5 shrink-0" />
-            <span className="truncate">Rechercher un outil, une action…</span>
+            <span className="truncate">{t('nav.search')}</span>
             <Kbd className="ml-auto hidden shrink-0 sm:inline-flex">Ctrl K</Kbd>
           </button>
 

@@ -2,6 +2,7 @@
 import { ClipboardPaste } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n';
 
 interface PasteButtonProps {
   onPaste: (text: string) => void;
@@ -9,7 +10,8 @@ interface PasteButtonProps {
   className?: string;
 }
 
-export default function PasteButton({ onPaste, label = 'Coller', className }: PasteButtonProps) {
+export default function PasteButton({ onPaste, label, className }: PasteButtonProps) {
+  const t = useT();
   return (
     <Button
       type="button"
@@ -26,7 +28,7 @@ export default function PasteButton({ onPaste, label = 'Coller', className }: Pa
       className={cn('gap-1.5 text-muted-foreground hover:text-foreground', className)}
     >
       <ClipboardPaste className="h-3.5 w-3.5" />
-      {label}
+      {label ?? t('common.paste')}
     </Button>
   );
 }

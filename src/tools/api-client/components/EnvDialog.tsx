@@ -13,9 +13,11 @@ import { Button } from '@/components/ui/button';
 import { actions, useApiClient } from '../store';
 import { newId, type Variable } from '../types';
 import KvEditor from './KvEditor';
+import { useT } from '@/i18n';
 
 export default function EnvDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
   const state = useApiClient();
+  const t = useT();
   const [selectedId, setSelectedId] = useState<string | null>(state.activeEnvId);
 
   useEffect(() => {
@@ -28,9 +30,9 @@ export default function EnvDialog({ open, onOpenChange }: { open: boolean; onOpe
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Environnements & variables</DialogTitle>
+          <DialogTitle>{t('api.envTitle')}</DialogTitle>
           <DialogDescription>
-            Utilise <code className="font-mono">{'{{clé}}'}</code> dans une URL, un en-tête, l'auth ou le corps.
+            {t('api.envDesc')}
           </DialogDescription>
         </DialogHeader>
 
@@ -54,7 +56,7 @@ export default function EnvDialog({ open, onOpenChange }: { open: boolean; onOpe
               className="inline-flex items-center gap-1.5 rounded-md border border-dashed border-border px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
             >
               <Plus className="h-3.5 w-3.5" />
-              Nouveau
+              {t('api.envNew')}
             </button>
           </div>
 
@@ -73,12 +75,12 @@ export default function EnvDialog({ open, onOpenChange }: { open: boolean; onOpe
                     size="sm"
                     onClick={() => actions.setActiveEnv(env.id)}
                   >
-                    {state.activeEnvId === env.id ? 'Actif' : 'Activer'}
+                    {state.activeEnvId === env.id ? t('api.envActive') : t('api.envActivate')}
                   </Button>
                   <button
                     onClick={() => actions.deleteEnv(env.id)}
                     className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                    aria-label="Supprimer l'environnement"
+                    aria-label={t('api.envDeleteEnv')}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -89,21 +91,21 @@ export default function EnvDialog({ open, onOpenChange }: { open: boolean; onOpe
                   onChange={(variables) => actions.setEnvVariables(env.id, variables)}
                   keyPlaceholder="baseUrl"
                   valuePlaceholder="http://localhost:3000"
-                  addLabel="Ajouter une variable"
+                  addLabel={t('api.addVar')}
                   extra={(row, update) => (
                     <button
                       onClick={() => update({ secret: !row.secret })}
-                      title={row.secret ? 'Valeur masquée' : 'Valeur visible'}
+                      title={row.secret ? t('api.envSecret') : t('api.envClear')}
                       className={`shrink-0 rounded px-1.5 py-1 text-[10px] ${row.secret ? 'text-amber-500' : 'text-muted-foreground'}`}
                     >
-                      {row.secret ? 'secret' : 'clair'}
+                      {row.secret ? t('api.envSecret') : t('api.envClear')}
                     </button>
                   )}
                 />
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">
-                Aucun environnement. Crée-en un pour définir des variables.
+                {t('api.collectionsEmpty')}
               </p>
             )}
           </div>

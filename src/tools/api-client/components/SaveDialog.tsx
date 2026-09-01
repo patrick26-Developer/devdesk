@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 
 import { actions, useApiClient } from '../store';
 import type { CollectionItem, RequestDef } from '../types';
+import { useT } from '@/i18n';
 
 function folderOptions(items: CollectionItem[], prefix = ''): { id: string; label: string }[] {
   const out: { id: string; label: string }[] = [];
@@ -34,6 +35,7 @@ export default function SaveDialog({
   request: RequestDef;
 }) {
   const state = useApiClient();
+  const t = useT();
   const [name, setName] = useState(request.name);
   const [collectionId, setCollectionId] = useState<string>('');
   const [folderId, setFolderId] = useState<string>('');
@@ -50,8 +52,8 @@ export default function SaveDialog({
 
   const save = () => {
     let cid = collectionId;
-    if (!cid) cid = actions.addCollection('Ma collection');
-    actions.saveRequestToCollection(cid, folderId || null, { ...request, name: name.trim() || 'Requête' });
+    if (!cid) cid = actions.addCollection('My collection');
+    actions.saveRequestToCollection(cid, folderId || null, { ...request, name: name.trim() || t('api.request') });
     onOpenChange(false);
   };
 
@@ -59,17 +61,17 @@ export default function SaveDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Enregistrer la requête</DialogTitle>
-          <DialogDescription>Elle sera ajoutée à une collection pour être réutilisée.</DialogDescription>
+          <DialogTitle>{t('api.saveTitle')}</DialogTitle>
+          <DialogDescription>{t('api.saveDesc')}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-3">
           <label className="block">
-            <span className="mb-1 block text-xs font-medium">Nom</span>
+            <span className="mb-1 block text-xs font-medium">{t('api.saveName')}</span>
             <Input value={name} onChange={(e) => setName(e.target.value)} className="h-9" />
           </label>
           <label className="block">
-            <span className="mb-1 block text-xs font-medium">Collection</span>
+            <span className="mb-1 block text-xs font-medium">{t('api.saveCollection')}</span>
             <select
               value={collectionId}
               onChange={(e) => {
@@ -78,7 +80,7 @@ export default function SaveDialog({
               }}
               className="h-9 w-full rounded-lg border border-input bg-transparent px-2 text-xs"
             >
-              <option value="">+ Nouvelle collection</option>
+              <option value="">{t('api.saveNewCollection')}</option>
               {state.collections.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -88,13 +90,13 @@ export default function SaveDialog({
           </label>
           {collection && folderOptions(collection.items).length > 0 && (
             <label className="block">
-              <span className="mb-1 block text-xs font-medium">Dossier</span>
+              <span className="mb-1 block text-xs font-medium">{t('api.saveFolder')}</span>
               <select
                 value={folderId}
                 onChange={(e) => setFolderId(e.target.value)}
                 className="h-9 w-full rounded-lg border border-input bg-transparent px-2 text-xs"
               >
-                <option value="">(racine)</option>
+                <option value="">{t('api.saveRoot')}</option>
                 {folderOptions(collection.items).map((f) => (
                   <option key={f.id} value={f.id}>
                     {f.label}
@@ -107,9 +109,9 @@ export default function SaveDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Annuler
+            {t('common.cancel')}
           </Button>
-          <Button onClick={save}>Enregistrer</Button>
+          <Button onClick={save}>{t('common.save')}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

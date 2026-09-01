@@ -2,11 +2,12 @@ import { useMemo } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import type { BodyConfig, BodyType } from '../types';
 import KvEditor from './KvEditor';
+import { useT } from '@/i18n';
 
-const TYPES: { value: BodyType; label: string }[] = [
-  { value: 'none', label: 'Aucun' },
+const TYPES: { value: BodyType; labelKey?: string; label?: string }[] = [
+  { value: 'none', labelKey: 'api.body.none' },
   { value: 'json', label: 'JSON' },
-  { value: 'text', label: 'Texte brut' },
+  { value: 'text', labelKey: 'api.body.text' },
   { value: 'urlencoded', label: 'x-www-form-urlencoded' },
   { value: 'form', label: 'form-data' },
   { value: 'graphql', label: 'GraphQL' },
@@ -19,6 +20,7 @@ interface BodyEditorProps {
 }
 
 export default function BodyEditor({ body, onChange, disabled }: BodyEditorProps) {
+  const t = useT();
   const jsonState = useMemo(() => {
     if (body.type !== 'json' || !body.content.trim()) return null;
     try {
@@ -30,23 +32,23 @@ export default function BodyEditor({ body, onChange, disabled }: BodyEditorProps
   }, [body.type, body.content]);
 
   if (disabled) {
-    return <p className="text-xs text-muted-foreground">La méthode {`(GET / HEAD)`} n'a pas de corps.</p>;
+    return <p className="text-xs text-muted-foreground">{t('api.body.disabled')}</p>;
   }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       <div className="flex flex-wrap gap-1.5">
-        {TYPES.map((t) => (
+        {TYPES.map((ty) => (
           <button
-            key={t.value}
-            onClick={() => onChange({ ...body, type: t.value })}
+            key={ty.value}
+            onClick={() => onChange({ ...body, type: ty.value })}
             className={`rounded-md border px-2.5 py-1 text-xs ${
-              body.type === t.value
+              body.type === ty.value
                 ? 'border-primary/30 bg-primary/10 text-primary'
                 : 'border-border text-muted-foreground hover:text-foreground'
             }`}
           >
-            {t.label}
+            {ty.labelKey ? t(ty.labelKey) : ty.label}
           </button>
         ))}
       </div>
@@ -72,11 +74,11 @@ export default function BodyEditor({ body, onChange, disabled }: BodyEditorProps
         <KvEditor
           rows={body.fields}
           onChange={(fields) => onChange({ ...body, fields })}
-          addLabel="Ajouter un champ"
+          addLabel={t('api.addField')}
         />
       )}
 
-      {body.type === 'none' && <p className="text-xs text-muted-foreground">Aucun corps ne sera envoyé.</p>}
+      {body.type === 'none' && <p className="text-xs text-muted-foreground">{t('api.body.noneMsg')}</p>}
     </div>
   );
 }

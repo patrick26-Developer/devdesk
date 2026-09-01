@@ -14,6 +14,7 @@ import {
 import { actions, useApiClient } from '../store';
 import type { CollectionItem, HistoryEntry } from '../types';
 import InlineEdit from './InlineEdit';
+import { useT } from '@/i18n';
 
 function countRequests(items: CollectionItem[]): number {
   return items.reduce((n, it) => n + (it.type === 'request' ? 1 : countRequests(it.items)), 0);
@@ -35,6 +36,7 @@ interface WorkspacePanelProps {
 }
 
 export default function WorkspacePanel({ onOpenHistory, onManageCollection }: WorkspacePanelProps) {
+  const t = useT();
   const state = useApiClient();
   const [view, setView] = useState<'collections' | 'history'>('collections');
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
@@ -48,14 +50,14 @@ export default function WorkspacePanel({ onOpenHistory, onManageCollection }: Wo
           onClick={() => setView('collections')}
           className={`flex-1 rounded-md px-2 py-1 text-xs font-medium ${view === 'collections' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'}`}
         >
-          Collections
+          {t('api.collections')}
         </button>
         <button
           onClick={() => setView('history')}
           className={`flex flex-1 items-center justify-center gap-1 rounded-md px-2 py-1 text-xs font-medium ${view === 'history' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'}`}
         >
           <History className="h-3.5 w-3.5" />
-          Historique
+          {t('api.history')}
         </button>
       </div>
 
@@ -66,12 +68,12 @@ export default function WorkspacePanel({ onOpenHistory, onManageCollection }: Wo
             className="mb-2 inline-flex w-full items-center gap-1.5 rounded-md border border-dashed border-border px-2 py-1.5 text-xs text-muted-foreground hover:border-primary/30 hover:text-foreground"
           >
             <Plus className="h-3.5 w-3.5" />
-            Nouvelle collection
+            {t('api.newCollection')}
           </button>
 
           {state.collections.length === 0 && (
             <p className="px-1 py-4 text-center text-[11px] text-muted-foreground">
-              Enregistre une requête pour créer ta première collection.
+              {t('api.collectionsEmpty')}
             </p>
           )}
 
@@ -80,7 +82,7 @@ export default function WorkspacePanel({ onOpenHistory, onManageCollection }: Wo
             return (
               <div key={col.id} className="mb-1">
                 <div className="group flex items-center gap-1 rounded-md px-1 py-1 hover:bg-accent/50">
-                  <button onClick={() => toggle(col.id)} className="shrink-0" aria-label="Développer">
+                  <button onClick={() => toggle(col.id)} className="shrink-0" aria-label="expand">
                     {expanded[col.id] === false ? (
                       <ChevronRight className="h-3.5 w-3.5" />
                     ) : (
@@ -99,21 +101,21 @@ export default function WorkspacePanel({ onOpenHistory, onManageCollection }: Wo
                       setExpanded((e) => ({ ...e, [col.id]: true }));
                     }}
                     className="shrink-0 opacity-0 group-hover:opacity-100"
-                    title="Nouvelle requête"
+                    title={t('api.newRequestTitle')}
                   >
                     <FilePlus className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
                   </button>
                   <button
-                    onClick={() => actions.addFolder(col.id, null, 'Dossier')}
+                    onClick={() => actions.addFolder(col.id, null, t('api.newFolder'))}
                     className="shrink-0 opacity-0 group-hover:opacity-100"
-                    title="Nouveau dossier"
+                    title={t('api.newFolder')}
                   >
                     <FolderPlus className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
                   </button>
                   <button
                     onClick={() => onManageCollection(col.id)}
                     className="shrink-0 opacity-0 group-hover:opacity-100"
-                    title="Paramètres de la collection"
+                    title={t('api.colSettings')}
                   >
                     <MoreVertical className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
                   </button>
@@ -123,7 +125,7 @@ export default function WorkspacePanel({ onOpenHistory, onManageCollection }: Wo
                   <div className="ml-3 border-l border-border pl-1">
                     {col.items.length === 0 && (
                       <p className="px-2 py-1 text-[11px] text-muted-foreground/70">
-                        Vide — clique sur l'icône « + fichier ».
+                        {t('api.folderEmpty')}
                       </p>
                     )}
                     <Tree
@@ -144,10 +146,12 @@ export default function WorkspacePanel({ onOpenHistory, onManageCollection }: Wo
       ) : (
         <div className="min-h-0 flex-1 overflow-auto p-2">
           <div className="mb-1 flex items-center justify-between px-1">
-            <span className="text-[11px] text-muted-foreground">{state.history.length} entrées</span>
+            <span className="text-[11px] text-muted-foreground">
+              {t('api.historyEntries', { n: state.history.length })}
+            </span>
             {state.history.length > 0 && (
               <button onClick={actions.clearHistory} className="text-[11px] text-muted-foreground hover:text-destructive">
-                Vider
+                {t('common.clear')}
               </button>
             )}
           </div>
@@ -170,7 +174,7 @@ export default function WorkspacePanel({ onOpenHistory, onManageCollection }: Wo
             </button>
           ))}
           {state.history.length === 0 && (
-            <p className="px-1 py-4 text-center text-[11px] text-muted-foreground">Aucune requête envoyée.</p>
+            <p className="px-1 py-4 text-center text-[11px] text-muted-foreground">{t('api.emptyHistory')}</p>
           )}
         </div>
       )}
@@ -195,13 +199,14 @@ function Tree({
   onExpand: (id: string) => void;
   depth: number;
 }) {
+  const t = useT();
   return (
     <>
       {items.map((it) =>
         it.type === 'folder' ? (
           <div key={it.id}>
             <div className="group flex items-center gap-1 rounded-md px-1 py-1 hover:bg-accent/50">
-              <button onClick={() => onToggle(it.id)} className="shrink-0" aria-label="Développer">
+              <button onClick={() => onToggle(it.id)} className="shrink-0" aria-label="expand">
                 {expanded[it.id] ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
               </button>
               <InlineEdit
@@ -218,21 +223,21 @@ function Tree({
                   onExpand(it.id);
                 }}
                 className="shrink-0 opacity-0 group-hover:opacity-100"
-                title="Nouvelle requête dans ce dossier"
+                title={t('api.newRequestInFolder')}
               >
                 <FilePlus className="h-3 w-3 text-muted-foreground hover:text-foreground" />
               </button>
               <button
-                onClick={() => actions.addFolder(collectionId, it.id, 'Dossier')}
+                onClick={() => actions.addFolder(collectionId, it.id, t('api.subFolder'))}
                 className="shrink-0 opacity-0 group-hover:opacity-100"
-                title="Sous-dossier"
+                title={t('api.subFolder')}
               >
                 <FolderPlus className="h-3 w-3 text-muted-foreground hover:text-foreground" />
               </button>
               <button
                 onClick={() => actions.deleteItem(it.id)}
                 className="shrink-0 opacity-0 group-hover:opacity-100"
-                title="Supprimer"
+                title={t('common.delete')}
               >
                 <Trash2 className="h-3 w-3 text-muted-foreground hover:text-destructive" />
               </button>
@@ -240,7 +245,7 @@ function Tree({
             {expanded[it.id] && (
               <div className="ml-3 border-l border-border pl-1">
                 {it.items.length === 0 && (
-                  <p className="px-2 py-1 text-[11px] text-muted-foreground/60">dossier vide</p>
+                  <p className="px-2 py-1 text-[11px] text-muted-foreground/60">{t("api.emptyFolder")}</p>
                 )}
                 <Tree
                   items={it.items}
@@ -267,14 +272,14 @@ function Tree({
             </span>
             <InlineEdit
               value={it.request.name}
-              placeholder="Requête"
+              placeholder={t("api.request")}
               className="min-w-0 flex-1 text-xs"
               onCommit={(name) => actions.renameItem(it.id, name)}
             />
             <button
               onClick={() => actions.duplicateItem(it.id)}
               className="shrink-0 opacity-0 group-hover:opacity-100"
-              title="Dupliquer"
+              title={t('common.duplicate')}
             >
               <Copy className="h-3 w-3 text-muted-foreground hover:text-foreground" />
             </button>

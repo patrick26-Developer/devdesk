@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { tools, searchTools, toolsByCategory, getCategory, type Tool } from '@/tools';
 import { BookOpen, Home, Info, Menu, Search, Settings, Star, X } from 'lucide-react';
 import { useFavorites } from '@/hooks/useFavorites';
+import { useT } from '@/i18n';
 import Logo from '@/components/Logo';
 
 interface SidebarProps {
@@ -14,6 +15,7 @@ interface SidebarProps {
 
 export default function Sidebar({ activeToolId, onSelectTool, isOpen, onClose }: SidebarProps) {
   const { isFavorite, toggleFavorite } = useFavorites();
+  const t = useT();
   const [query, setQuery] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -66,13 +68,13 @@ export default function Sidebar({ activeToolId, onSelectTool, isOpen, onClose }:
               <h1 className="truncate text-[15px] font-semibold tracking-tight text-sidebar-foreground">
                 DevDesk
               </h1>
-              <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">Developer Toolbox</p>
+              <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">{t('nav.subtitle')}</p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            aria-label="Fermer le menu"
+            aria-label={t('nav.closeMenu')}
             className="rounded-lg p-1.5 text-muted-foreground hover:bg-sidebar-accent md:hidden [-webkit-app-region:no-drag]"
           >
             <X className="h-4 w-4" />
@@ -87,8 +89,8 @@ export default function Sidebar({ activeToolId, onSelectTool, isOpen, onClose }:
               ref={searchRef}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Rechercher un outil..."
-              aria-label="Rechercher un outil"
+              placeholder={t('nav.searchTool')}
+              aria-label={t('nav.searchTool')}
               className="h-9 w-full rounded-lg border border-sidebar-border bg-sidebar-accent/35 pl-9 pr-3 text-xs text-sidebar-foreground outline-none placeholder:text-muted-foreground/70 transition-all duration-200 focus:border-primary/50 focus:bg-sidebar-accent/60 focus:ring-2 focus:ring-primary/10"
             />
           </div>
@@ -98,16 +100,16 @@ export default function Sidebar({ activeToolId, onSelectTool, isOpen, onClose }:
         <nav className="flex-1 overflow-y-auto px-3 py-4">
           {!query && (
             <>
-              <SectionLabel>Principal</SectionLabel>
+              <SectionLabel>{t('nav.principal')}</SectionLabel>
               <NavButton
                 icon={Home}
-                label="Accueil"
+                label={t('nav.home')}
                 active={activeToolId === 'home'}
                 onClick={() => handleSelect('home')}
               />
               <NavButton
                 icon={BookOpen}
-                label="Guide"
+                label={t('nav.guide')}
                 active={activeToolId === 'guide'}
                 onClick={() => handleSelect('guide')}
               />
@@ -118,7 +120,7 @@ export default function Sidebar({ activeToolId, onSelectTool, isOpen, onClose }:
             <>
               <SectionLabel className="mt-6">
                 <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                Favoris
+                {t('nav.favorites')}
               </SectionLabel>
               <div className="space-y-0.5">
                 {favoriteTools.map((tool) => (
@@ -139,7 +141,7 @@ export default function Sidebar({ activeToolId, onSelectTool, isOpen, onClose }:
             <div key={category.key}>
               <SectionLabel className="mt-6">
                 <span className={cn('h-1.5 w-1.5 rounded-full', category.dot)} />
-                {category.label}
+                {t(`cat.${category.key}`)}
               </SectionLabel>
               <div className="space-y-0.5">
                 {categoryTools.map((tool) => (
@@ -159,8 +161,8 @@ export default function Sidebar({ activeToolId, onSelectTool, isOpen, onClose }:
           {query && groups.length === 0 && (
             <div className="px-2 py-8 text-center">
               <Search className="mx-auto h-5 w-5 text-muted-foreground/50" />
-              <p className="mt-2 text-xs font-medium text-muted-foreground">Aucun outil trouvé</p>
-              <p className="mt-1 text-[10px] text-muted-foreground/70">Essayez avec un autre terme.</p>
+              <p className="mt-2 text-xs font-medium text-muted-foreground">{t('nav.noResult')}</p>
+              <p className="mt-1 text-[10px] text-muted-foreground/70">{t('nav.tryAnother')}</p>
             </div>
           )}
         </nav>
@@ -169,13 +171,13 @@ export default function Sidebar({ activeToolId, onSelectTool, isOpen, onClose }:
         <div className="border-t border-sidebar-border/70 p-3">
           <NavButton
             icon={Settings}
-            label="Paramètres"
+            label={t('nav.settings')}
             active={activeToolId === 'settings'}
             onClick={() => handleSelect('settings')}
           />
           <NavButton
             icon={Info}
-            label="À propos"
+            label={t('nav.about')}
             active={activeToolId === 'about'}
             onClick={() => handleSelect('about')}
           />
@@ -257,6 +259,7 @@ function ToolRow({
 }) {
   const Icon = tool.icon;
   const accent = getCategory(tool.category).dot;
+  const t = useT();
 
   return (
     <div className="group flex items-center gap-1">
@@ -289,7 +292,7 @@ function ToolRow({
           e.stopPropagation();
           onToggleFavorite();
         }}
-        aria-label={favorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+        aria-label={favorite ? t('fav.remove') : t('fav.add')}
         className={cn(
           'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-all duration-200',
           favorite
@@ -305,10 +308,11 @@ function ToolRow({
 
 // Export du composant bouton "menu" utilisé dans App.tsx
 export function SidebarToggle({ onClick }: { onClick: () => void }) {
+  const t = useT();
   return (
     <button
       onClick={onClick}
-      aria-label="Ouvrir le menu"
+      aria-label={t('nav.openMenu')}
       className="rounded-lg p-2 text-muted-foreground hover:bg-accent md:hidden"
     >
       <Menu className="h-5 w-5" />
