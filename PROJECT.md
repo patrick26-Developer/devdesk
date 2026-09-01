@@ -143,6 +143,23 @@ Il fait le travail mécanique de lecture et de rédaction, il ne décide pas à 
 - **67c9db1** Barre de titre intégrée (frameless) : `titleBarOverlay` (Windows) /
   `hiddenInset` (macOS), zones de déplacement, couleur des contrôles suit le thème.
 
+### Guide réécrit + audit — 2026-09-01
+
+- **Guide** (`src/pages/Guide.tsx`) entièrement repensé : section « Prise en main »
+  (palette, analyse presse-papiers, favoris, thème/langue, données locales, raccourcis),
+  filtre d'outils, regroupement par catégorie avec compteurs, cartes dépliables
+  (Rôle / Quand l'utiliser / Mode opératoire numéroté / Ce qui s'applique / Astuce),
+  bouton « Ouvrir l'outil ». Guide reçoit `onSelectTool` depuis `App.tsx`.
+- Contenu du guide développé pour les 27 outils, FR + EN : 5 champs par outil
+  (`guide.<id>.role|need|steps|details|tip`) décrivant le mode opératoire réel,
+  les options, les limites et ce qui s'applique aujourd'hui. `guide.<id>.usage`
+  remplacé par `steps` (étapes séparées par \n).
+- `ToolShell` : import de `METHOD_TEXT` remis à sa place (cosmétique).
+- Audit : smoke test Electron parcourant les 27 outils + interactions de base →
+  0 erreur console. Smoke ciblé API Client : login → 200, 2/2 tests, extraction
+  de `{{accessToken}}`, création de requête, runner. Guide : 27 cartes, filtre,
+  déplier/replier, navigation vers l'outil.
+
 ### Corrections — 2026-09-01
 
 - **6a6dba6** `store.ts` : `emptyRequest()` utilisé dans `newDraft()` / `newRequestIn()`

@@ -19,6 +19,10 @@ import RequestBuilder from './components/RequestBuilder';
 import ResponseView from './components/ResponseView';
 import WorkspacePanel from './components/WorkspacePanel';
 import InlineEdit from './components/InlineEdit';
+import EnvDialog from './components/EnvDialog';
+import SaveDialog from './components/SaveDialog';
+import RunnerDialog from './components/RunnerDialog';
+import CollectionDialog from './components/CollectionDialog';
 
 const METHOD_TEXT: Record<string, string> = {
   GET: 'text-emerald-500',
@@ -29,10 +33,6 @@ const METHOD_TEXT: Record<string, string> = {
   HEAD: 'text-muted-foreground',
   OPTIONS: 'text-muted-foreground',
 };
-import EnvDialog from './components/EnvDialog';
-import SaveDialog from './components/SaveDialog';
-import RunnerDialog from './components/RunnerDialog';
-import CollectionDialog from './components/CollectionDialog';
 
 export default function ApiClient() {
   const tool = getTool('api-tester')!;

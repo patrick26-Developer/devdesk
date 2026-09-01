@@ -109,7 +109,7 @@ export default function App() {
         <div className="min-h-0 flex-1 overflow-auto">
           {activeToolId === 'settings' && <Settings />}
           {activeToolId === 'about' && <About />}
-          {activeToolId === 'guide' && <Guide />}
+          {activeToolId === 'guide' && <Guide onSelectTool={navigate} />}
           {activeToolId === 'home' && <Home onSelectTool={navigate} />}
           {activeTool && ActiveComponent && <ActiveComponent />}
         </div>
