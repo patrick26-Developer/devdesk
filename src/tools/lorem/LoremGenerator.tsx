@@ -6,6 +6,7 @@ import ToolShell from '@/components/tool/ToolShell';
 import { Panel, PanelHeader } from '@/components/tool/Panel';
 import CopyButton from '@/components/CopyButton';
 import { getTool } from '@/tools';
+import { useT } from '@/i18n';
 import { RefreshCw } from 'lucide-react';
 
 const WORDS = [
@@ -31,6 +32,7 @@ function generateParagraph(): string {
 
 export default function LoremGenerator() {
   const tool = getTool('lorem')!;
+  const t = useT();
   const [count, setCount] = useState(3);
   const [output, setOutput] = useState('');
 
@@ -45,7 +47,7 @@ export default function LoremGenerator() {
       actions={
         <Button onClick={generate} size="sm" className="gap-2">
           <RefreshCw className="h-3.5 w-3.5" />
-          Générer
+          {t('common.generate')}
         </Button>
       }
     >
@@ -57,21 +59,21 @@ export default function LoremGenerator() {
           value={count}
           onChange={(e) => setCount(Math.min(20, Math.max(1, Number(e.target.value))))}
           className="h-9 w-20 font-mono text-sm"
-          aria-label="Nombre de paragraphes"
+          aria-label={t('ui.lorem.countLabel')}
         />
-        <span className="text-xs text-muted-foreground">paragraphe(s)</span>
+        <span className="text-xs text-muted-foreground">{t('ui.lorem.paragraphs')}</span>
       </div>
 
       <Panel className="min-h-0 flex-1">
         <PanelHeader
-          title="Texte généré"
-          subtitle="Contenu fictif · génération locale"
-          right={output ? <CopyButton value={output} label="Copier" /> : undefined}
+          title={t('ui.lorem.title')}
+          subtitle={t('ui.lorem.subtitle')}
+          right={output ? <CopyButton value={output} label={t('common.copy')} /> : undefined}
         />
         <Textarea
           value={output}
           readOnly
-          placeholder="Le texte généré apparaîtra ici..."
+          placeholder={t('ui.lorem.placeholder')}
           className="min-h-0 flex-1 resize-none rounded-none border-0 bg-muted/10 p-5 font-mono text-xs leading-6 focus-visible:ring-0"
         />
       </Panel>

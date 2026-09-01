@@ -286,7 +286,7 @@ function Tree({
             <button
               onClick={() => actions.deleteItem(it.id)}
               className="shrink-0 opacity-0 group-hover:opacity-100"
-              title="Supprimer"
+              title={t('common.delete')}
             >
               <Trash2 className="h-3 w-3 text-muted-foreground hover:text-destructive" />
             </button>

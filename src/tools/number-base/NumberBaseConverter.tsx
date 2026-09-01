@@ -5,12 +5,13 @@ import { Panel, PanelHeader } from '@/components/tool/Panel';
 import CopyButton from '@/components/CopyButton';
 import { usePersistentState } from '@/hooks/usePersistentState';
 import { getTool } from '@/tools';
+import { useT } from '@/i18n';
 
-const BASES: { key: string; label: string; radix: number; prefix: string }[] = [
-  { key: 'bin', label: 'Binaire', radix: 2, prefix: '0b' },
-  { key: 'oct', label: 'Octal', radix: 8, prefix: '0o' },
-  { key: 'dec', label: 'Décimal', radix: 10, prefix: '' },
-  { key: 'hex', label: 'Hexadécimal', radix: 16, prefix: '0x' },
+const BASES: { key: string; labelKey: string; radix: number; prefix: string }[] = [
+  { key: 'bin', labelKey: 'ui.nb.bin', radix: 2, prefix: '0b' },
+  { key: 'oct', labelKey: 'ui.nb.oct', radix: 8, prefix: '0o' },
+  { key: 'dec', labelKey: 'ui.nb.dec', radix: 10, prefix: '' },
+  { key: 'hex', labelKey: 'ui.nb.hex', radix: 16, prefix: '0x' },
 ];
 
 function parseInput(raw: string): bigint | null {
@@ -30,6 +31,7 @@ function parseInput(raw: string): bigint | null {
 
 export default function NumberBaseConverter() {
   const tool = getTool('number-base')!;
+  const t = useT();
   const [value, setValue] = usePersistentState('number-base:value', '255');
   const [bitWidth, setBitWidth] = useState(8);
 
@@ -44,7 +46,7 @@ export default function NumberBaseConverter() {
     <ToolShell tool={tool}>
       <div className="flex flex-col gap-2">
         <label className="text-xs font-medium">
-          Nombre <span className="text-muted-foreground">(préfixes 0b / 0o / 0x acceptés)</span>
+          {t('ui.nb.numberLabel')} <span className="text-muted-foreground">{t('ui.nb.prefixHint')}</span>
         </label>
         <Input
           value={value}
@@ -53,12 +55,12 @@ export default function NumberBaseConverter() {
           className="h-11 font-mono text-sm"
         />
         {value.trim() && parsed === null && (
-          <p className="text-xs text-destructive">Entrée invalide pour la base détectée.</p>
+          <p className="text-xs text-destructive">{t('ui.nb.invalid')}</p>
         )}
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {BASES.map(({ key, label, radix, prefix }) => {
+        {BASES.map(({ key, labelKey, radix, prefix }) => {
           const out =
             parsed !== null
               ? (parsed < 0n ? '-' : '') +
@@ -67,7 +69,7 @@ export default function NumberBaseConverter() {
               : '';
           return (
             <Panel key={key}>
-              <PanelHeader title={label} subtitle={`base ${radix}`} right={<CopyButton value={out} />} />
+              <PanelHeader title={t(labelKey)} subtitle={t('ui.nb.base', { r: radix })} right={<CopyButton value={out} />} />
               <div className="p-4">
                 <code className="block break-all font-mono text-sm text-foreground">
                   {out || <span className="text-muted-foreground">—</span>}
@@ -80,9 +82,9 @@ export default function NumberBaseConverter() {
 
       <Panel className="p-4">
         <div className="mb-3 flex items-center justify-between">
-          <p className="text-sm font-medium">Représentation binaire</p>
+          <p className="text-sm font-medium">{t('ui.nb.binRepr')}</p>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>Largeur</span>
+            <span>{t('ui.nb.width')}</span>
             {[8, 16, 32, 64].map((w) => (
               <button
                 key={w}
@@ -115,7 +117,7 @@ export default function NumberBaseConverter() {
               ))}
           </div>
         ) : (
-          <p className="text-xs text-muted-foreground">Disponible pour un entier positif.</p>
+          <p className="text-xs text-muted-foreground">{t('ui.nb.positiveOnly')}</p>
         )}
       </Panel>
     </ToolShell>

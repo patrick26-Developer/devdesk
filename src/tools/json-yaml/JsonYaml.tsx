@@ -8,10 +8,12 @@ import { Panel, PanelHeader } from '@/components/tool/Panel';
 import CopyButton from '@/components/CopyButton';
 import { usePersistentState } from '@/hooks/usePersistentState';
 import { getTool } from '@/tools';
+import { useT } from '@/i18n';
 import { ArrowLeftRight } from 'lucide-react';
 
 export default function JsonYaml() {
   const tool = getTool('json-yaml')!;
+  const t = useT();
   const [mode, setMode] = usePersistentState<'json2yaml' | 'yaml2json'>('json-yaml:mode', 'json2yaml');
   const [input, setInput] = usePersistentState(
     'json-yaml:input',
@@ -47,7 +49,7 @@ export default function JsonYaml() {
     >
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-2">
         <Panel className="min-h-0">
-          <PanelHeader title={mode === 'json2yaml' ? 'JSON' : 'YAML'} subtitle="Entrée" />
+          <PanelHeader title={mode === 'json2yaml' ? 'JSON' : 'YAML'} subtitle={t('common.input')} />
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -58,14 +60,14 @@ export default function JsonYaml() {
         <Panel className="min-h-0">
           <PanelHeader
             title={mode === 'json2yaml' ? 'YAML' : 'JSON'}
-            subtitle="Résultat"
+            subtitle={t('common.result')}
             right={<CopyButton value={result.output} />}
           />
           {result.error ? (
-            <div className="p-4 text-xs text-destructive">Erreur : {result.error}</div>
+            <div className="p-4 text-xs text-destructive">{t('common.error')} : {result.error}</div>
           ) : (
             <pre className="min-h-0 flex-1 overflow-auto bg-muted/[0.08] p-4 font-mono text-[13px] leading-6 text-foreground">
-              {result.output || '// En attente…'}
+              {result.output || t('ui.conv.waiting')}
             </pre>
           )}
         </Panel>

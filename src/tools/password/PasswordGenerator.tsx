@@ -6,6 +6,7 @@ import { Panel } from '@/components/tool/Panel';
 import CopyButton from '@/components/CopyButton';
 import { usePersistentState } from '@/hooks/usePersistentState';
 import { getTool } from '@/tools';
+import { useT } from '@/i18n';
 import { RefreshCw, ShieldCheck } from 'lucide-react';
 
 const SETS = {
@@ -51,16 +52,17 @@ function generate(opts: Options): string {
   return out;
 }
 
-function strength(pw: string, poolSize: number): { bits: number; label: string; className: string } {
+function strength(pw: string, poolSize: number): { bits: number; labelKey: string; className: string } {
   const bits = pw ? Math.round(pw.length * Math.log2(Math.max(poolSize, 2))) : 0;
-  if (bits < 40) return { bits, label: 'Faible', className: 'text-red-500' };
-  if (bits < 70) return { bits, label: 'Correct', className: 'text-amber-500' };
-  if (bits < 100) return { bits, label: 'Fort', className: 'text-emerald-500' };
-  return { bits, label: 'Très fort', className: 'text-emerald-500' };
+  if (bits < 40) return { bits, labelKey: 'ui.pw.weak', className: 'text-red-500' };
+  if (bits < 70) return { bits, labelKey: 'ui.pw.ok', className: 'text-amber-500' };
+  if (bits < 100) return { bits, labelKey: 'ui.pw.strong', className: 'text-emerald-500' };
+  return { bits, labelKey: 'ui.pw.veryStrong', className: 'text-emerald-500' };
 }
 
 export default function PasswordGenerator() {
   const tool = getTool('password')!;
+  const t = useT();
   const [opts, setOpts] = usePersistentState<Options>('password:opts', {
     length: 20,
     lower: true,
@@ -94,13 +96,13 @@ export default function PasswordGenerator() {
       actions={
         <Button onClick={regen} size="sm" className="gap-2" disabled={noSet}>
           <RefreshCw className="h-3.5 w-3.5" />
-          Générer
+          {t('common.generate')}
         </Button>
       }
     >
       <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3.5 py-2.5 text-xs text-muted-foreground">
         <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-500" />
-        <span>Généré localement avec crypto.getRandomValues. Rien n'est stocké ni transmis.</span>
+        <span>{t('ui.pw.note')}</span>
       </div>
 
       <Panel>
@@ -108,20 +110,20 @@ export default function PasswordGenerator() {
           <code className="min-w-0 flex-1 break-all font-mono text-base text-foreground">
             {password || <span className="text-muted-foreground">—</span>}
           </code>
-          <CopyButton value={password} label="Copier" variant="secondary" />
+          <CopyButton value={password} label={t('common.copy')} variant="secondary" />
         </div>
         <div className="flex items-center justify-between border-t border-border bg-muted/20 px-4 py-2 text-[11px]">
           <span className="text-muted-foreground">
-            Entropie estimée : <span className="tabular-nums text-foreground">{s.bits} bits</span>
+            {t('ui.pw.entropy')} : <span className="tabular-nums text-foreground">{t('ui.pw.bits', { n: s.bits })}</span>
           </span>
-          <span className={s.className}>{password ? s.label : ''}</span>
+          <span className={s.className}>{password ? t(s.labelKey) : ''}</span>
         </div>
       </Panel>
 
       <Panel className="p-4">
         <div className="mb-4 flex items-center justify-between gap-4">
           <label htmlFor="pw-length" className="text-sm font-medium">
-            Longueur
+            {t('ui.pw.length')}
           </label>
           <span className="font-mono text-sm tabular-nums">{opts.length}</span>
         </div>
@@ -136,12 +138,12 @@ export default function PasswordGenerator() {
         />
 
         <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
-          <OptionRow label="Minuscules (a-z)" checked={opts.lower} onChange={() => toggle('lower')} />
-          <OptionRow label="Majuscules (A-Z)" checked={opts.upper} onChange={() => toggle('upper')} />
-          <OptionRow label="Chiffres (0-9)" checked={opts.digits} onChange={() => toggle('digits')} />
-          <OptionRow label="Symboles (!@#…)" checked={opts.symbols} onChange={() => toggle('symbols')} />
+          <OptionRow label={t('ui.pw.lower')} checked={opts.lower} onChange={() => toggle('lower')} />
+          <OptionRow label={t('ui.pw.upper')} checked={opts.upper} onChange={() => toggle('upper')} />
+          <OptionRow label={t('ui.pw.digits')} checked={opts.digits} onChange={() => toggle('digits')} />
+          <OptionRow label={t('ui.pw.symbols')} checked={opts.symbols} onChange={() => toggle('symbols')} />
           <OptionRow
-            label="Exclure les caractères ambigus (Il1O0o)"
+            label={t('ui.pw.excludeAmbiguous')}
             checked={opts.excludeAmbiguous}
             onChange={() => toggle('excludeAmbiguous')}
           />
@@ -149,7 +151,7 @@ export default function PasswordGenerator() {
 
         {noSet && (
           <p className="mt-4 rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2 text-xs text-destructive">
-            Sélectionnez au moins un type de caractère.
+            {t('ui.pw.noSet')}
           </p>
         )}
       </Panel>

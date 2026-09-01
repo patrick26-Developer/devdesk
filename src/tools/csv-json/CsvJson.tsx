@@ -6,6 +6,7 @@ import { Panel, PanelHeader } from '@/components/tool/Panel';
 import CopyButton from '@/components/CopyButton';
 import { usePersistentState } from '@/hooks/usePersistentState';
 import { getTool } from '@/tools';
+import { useT } from '@/i18n';
 import { ArrowLeftRight } from 'lucide-react';
 
 // Parseur CSV minimal gérant les guillemets et les retours à la ligne échappés.
@@ -74,6 +75,7 @@ function jsonToCsv(text: string, delimiter: string): string {
 
 export default function CsvJson() {
   const tool = getTool('csv-json')!;
+  const t = useT();
   const [mode, setMode] = usePersistentState<'csv2json' | 'json2csv'>('csv-json:mode', 'csv2json');
   const [delimiter, setDelimiter] = usePersistentState('csv-json:delim', ',');
   const [input, setInput] = usePersistentState('csv-json:input', 'name,role,active\nPatrick,dev,true\nAda,lead,false');
@@ -109,21 +111,21 @@ export default function CsvJson() {
       }
     >
       <div className="flex flex-wrap items-center gap-3">
-        <label className="text-xs font-medium">Délimiteur</label>
+        <label className="text-xs font-medium">{t('ui.conv.delimiter')}</label>
         {[',', ';', '\t', '|'].map((d) => (
           <button
             key={d}
             onClick={() => setDelimiter(d)}
             className={`rounded px-2 py-1 font-mono text-xs ${delimiter === d ? 'bg-primary/10 text-primary' : 'hover:bg-accent'}`}
           >
-            {d === '\t' ? 'Tab' : d}
+            {d === '\t' ? t('ui.conv.tab') : d}
           </button>
         ))}
       </div>
 
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-2">
         <Panel className="min-h-0">
-          <PanelHeader title={mode === 'csv2json' ? 'CSV' : 'JSON'} subtitle="Entrée" />
+          <PanelHeader title={mode === 'csv2json' ? 'CSV' : 'JSON'} subtitle={t('common.input')} />
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -134,14 +136,14 @@ export default function CsvJson() {
         <Panel className="min-h-0">
           <PanelHeader
             title={mode === 'csv2json' ? 'JSON' : 'CSV'}
-            subtitle="Résultat"
+            subtitle={t('common.result')}
             right={<CopyButton value={result.output} />}
           />
           {result.error ? (
-            <div className="p-4 text-xs text-destructive">Erreur : {result.error}</div>
+            <div className="p-4 text-xs text-destructive">{t('common.error')} : {result.error}</div>
           ) : (
             <pre className="min-h-0 flex-1 overflow-auto bg-muted/[0.08] p-4 font-mono text-[13px] leading-6 text-foreground">
-              {result.output || '// En attente…'}
+              {result.output || t('ui.conv.waiting')}
             </pre>
           )}
         </Panel>

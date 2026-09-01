@@ -7,6 +7,7 @@ import CopyButton from '@/components/CopyButton';
 import PasteButton from '@/components/PasteButton';
 import { usePersistentState } from '@/hooks/usePersistentState';
 import { getTool } from '@/tools';
+import { useT } from '@/i18n';
 
 function pascal(name: string): string {
   const base = name.replace(/[^a-zA-Z0-9]+/g, ' ').trim().split(/\s+/).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join('');
@@ -62,6 +63,7 @@ function objectBody(obj: Record<string, unknown>, name: string, ctx: Ctx): strin
 
 export default function JsonToTs() {
   const tool = getTool('json-to-ts')!;
+  const tr = useT();
   const [input, setInput] = usePersistentState('json-to-ts:input', '{\n  "id": 1,\n  "name": "DevDesk",\n  "tags": ["dev", "local"],\n  "owner": { "email": "a@b.c", "admin": true }\n}');
   const [rootName, setRootName] = usePersistentState('json-to-ts:root', 'Root');
 
@@ -84,7 +86,7 @@ export default function JsonToTs() {
   return (
     <ToolShell tool={tool}>
       <div className="flex flex-wrap items-center gap-3">
-        <label className="text-xs font-medium">Nom de l'interface racine</label>
+        <label className="text-xs font-medium">{tr('ui.jts.rootLabel')}</label>
         <Input
           value={rootName}
           onChange={(e) => setRootName(e.target.value)}
@@ -96,7 +98,7 @@ export default function JsonToTs() {
         <Panel className="min-h-0">
           <PanelHeader
             title="JSON"
-            subtitle="Réponse d'API, fixture…"
+            subtitle={tr('ui.jts.jsonSub')}
             right={<PasteButton onPaste={setInput} />}
           />
           <Textarea
@@ -110,14 +112,14 @@ export default function JsonToTs() {
         <Panel className="min-h-0">
           <PanelHeader
             title="TypeScript"
-            subtitle="Interfaces générées"
+            subtitle={tr('ui.jts.tsSub')}
             right={<CopyButton value={result.output} />}
           />
           {result.error ? (
-            <div className="p-4 text-xs text-destructive">JSON invalide : {result.error}</div>
+            <div className="p-4 text-xs text-destructive">{tr('ui.jts.invalidJson', { msg: result.error })}</div>
           ) : (
             <pre className="min-h-0 flex-1 overflow-auto bg-muted/[0.08] p-4 font-mono text-[13px] leading-6 text-foreground">
-              {result.output || '// En attente de JSON…'}
+              {result.output || tr('ui.conv.waitingJson')}
             </pre>
           )}
         </Panel>

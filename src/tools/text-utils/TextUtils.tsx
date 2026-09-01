@@ -6,6 +6,7 @@ import { Panel, PanelHeader } from '@/components/tool/Panel';
 import CopyButton from '@/components/CopyButton';
 import { usePersistentState } from '@/hooks/usePersistentState';
 import { getTool } from '@/tools';
+import { useT } from '@/i18n';
 
 type Op =
   | 'sort-asc'
@@ -18,16 +19,16 @@ type Op =
   | 'upper'
   | 'shuffle';
 
-const OPS: { key: Op; label: string }[] = [
-  { key: 'sort-asc', label: 'Trier A→Z' },
-  { key: 'sort-desc', label: 'Trier Z→A' },
-  { key: 'dedupe', label: 'Dédupliquer' },
-  { key: 'reverse', label: 'Inverser l’ordre' },
-  { key: 'trim', label: 'Trim par ligne' },
-  { key: 'remove-empty', label: 'Retirer lignes vides' },
-  { key: 'lower', label: 'minuscules' },
-  { key: 'upper', label: 'MAJUSCULES' },
-  { key: 'shuffle', label: 'Mélanger' },
+const OPS: { key: Op; labelKey: string }[] = [
+  { key: 'sort-asc', labelKey: 'ui.tu.sortAsc' },
+  { key: 'sort-desc', labelKey: 'ui.tu.sortDesc' },
+  { key: 'dedupe', labelKey: 'ui.tu.dedupe' },
+  { key: 'reverse', labelKey: 'ui.tu.reverse' },
+  { key: 'trim', labelKey: 'ui.tu.trim' },
+  { key: 'remove-empty', labelKey: 'ui.tu.removeEmpty' },
+  { key: 'lower', labelKey: 'ui.tu.lower' },
+  { key: 'upper', labelKey: 'ui.tu.upper' },
+  { key: 'shuffle', labelKey: 'ui.tu.shuffle' },
 ];
 
 function apply(op: Op, lines: string[]): string[] {
@@ -61,6 +62,7 @@ function apply(op: Op, lines: string[]): string[] {
 
 export default function TextUtils() {
   const tool = getTool('text-utils')!;
+  const tr = useT();
   const [text, setText] = usePersistentState('text-utils:text', '');
 
   const stats = useMemo(() => {
@@ -78,26 +80,26 @@ export default function TextUtils() {
   return (
     <ToolShell tool={tool}>
       <div className="flex flex-wrap gap-2">
-        {OPS.map(({ key, label }) => (
+        {OPS.map(({ key, labelKey }) => (
           <Button key={key} variant="secondary" size="sm" onClick={() => run(key)} disabled={!text}>
-            {label}
+            {tr(labelKey)}
           </Button>
         ))}
       </div>
 
       <Panel className="min-h-0 flex-1">
-        <PanelHeader title="Texte" subtitle="Les opérations s'appliquent en place" right={<CopyButton value={text} />} />
+        <PanelHeader title={tr('ui.tu.title')} subtitle={tr('ui.tu.subtitle')} right={<CopyButton value={text} />} />
         <Textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Une valeur par ligne..."
+          placeholder={tr('ui.tu.placeholder')}
           className="min-h-0 flex-1 resize-none rounded-none border-0 bg-transparent p-4 font-mono text-sm leading-6 shadow-none focus-visible:ring-0"
         />
         <div className="flex flex-wrap items-center gap-4 border-t border-border bg-muted/10 px-4 py-2 text-[11px] text-muted-foreground tabular-nums">
-          <span>{stats.lines} lignes</span>
-          <span>{stats.words} mots</span>
-          <span>{stats.chars} caractères</span>
-          <span>{stats.bytes} octets</span>
+          <span>{tr('ui.tu.statLines', { n: stats.lines })}</span>
+          <span>{tr('ui.tu.statWords', { n: stats.words })}</span>
+          <span>{tr('ui.tu.statChars', { n: stats.chars })}</span>
+          <span>{tr('ui.tu.statBytes', { n: stats.bytes })}</span>
         </div>
       </Panel>
     </ToolShell>

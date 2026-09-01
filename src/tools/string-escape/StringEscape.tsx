@@ -7,18 +7,19 @@ import CopyButton from '@/components/CopyButton';
 import PasteButton from '@/components/PasteButton';
 import { usePersistentState } from '@/hooks/usePersistentState';
 import { getTool } from '@/tools';
+import { useT } from '@/i18n';
 import { ArrowLeftRight } from 'lucide-react';
 
 type Target = 'json' | 'html' | 'url' | 'backslash' | 'sql' | 'shell' | 'regex';
 
-const TARGETS: { key: Target; label: string; hint: string }[] = [
-  { key: 'json', label: 'Chaîne JSON', hint: 'contenu entre guillemets' },
-  { key: 'html', label: 'Entités HTML', hint: '& < > " \'' },
-  { key: 'url', label: 'URL', hint: 'encodeURIComponent' },
-  { key: 'backslash', label: 'Backslash', hint: '\\n \\t \\" \\\\' },
-  { key: 'sql', label: 'SQL', hint: "quote simple doublée" },
-  { key: 'shell', label: 'Shell', hint: 'guillemets simples POSIX' },
-  { key: 'regex', label: 'RegExp', hint: 'métacaractères échappés' },
+const TARGETS: { key: Target; labelKey: string; hintKey?: string; hint?: string }[] = [
+  { key: 'json', labelKey: 'ui.se.jsonLabel', hintKey: 'ui.se.jsonHint' },
+  { key: 'html', labelKey: 'ui.se.htmlLabel', hint: '& < > " \'' },
+  { key: 'url', labelKey: 'ui.se.urlLabel', hintKey: 'ui.se.urlHint' },
+  { key: 'backslash', labelKey: 'ui.se.backslashLabel', hint: '\\n \\t \\" \\\\' },
+  { key: 'sql', labelKey: 'ui.se.sqlLabel', hintKey: 'ui.se.sqlHint' },
+  { key: 'shell', labelKey: 'ui.se.shellLabel', hintKey: 'ui.se.shellHint' },
+  { key: 'regex', labelKey: 'ui.se.regexLabel', hintKey: 'ui.se.regexHint' },
 ];
 
 const HTML_ENTITIES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
@@ -69,6 +70,7 @@ function unescape(text: string, target: Target): string {
 
 export default function StringEscape() {
   const tool = getTool('string-escape')!;
+  const tr = useT();
   const [target, setTarget] = usePersistentState<Target>('string-escape:target', 'json');
   const [direction, setDirection] = usePersistentState<'escape' | 'unescape'>('string-escape:dir', 'escape');
   const [input, setInput] = usePersistentState('string-escape:input', 'Ligne 1\n"Bonjour", dit-il — 100% <ok>');
@@ -93,23 +95,23 @@ export default function StringEscape() {
           className="gap-2"
         >
           <ArrowLeftRight className="h-3.5 w-3.5" />
-          {direction === 'escape' ? 'Échapper' : 'Déséchapper'}
+          {direction === 'escape' ? tr('ui.se.escape') : tr('ui.se.unescape')}
         </Button>
       }
     >
       <div className="flex flex-wrap gap-1.5">
-        {TARGETS.map((t) => (
+        {TARGETS.map((tg) => (
           <button
-            key={t.key}
-            onClick={() => setTarget(t.key)}
-            title={t.hint}
+            key={tg.key}
+            onClick={() => setTarget(tg.key)}
+            title={tg.hintKey ? tr(tg.hintKey) : tg.hint}
             className={`rounded-md border px-2.5 py-1 text-xs ${
-              target === t.key
+              target === tg.key
                 ? 'border-primary/30 bg-primary/10 text-primary'
                 : 'border-border text-muted-foreground hover:text-foreground'
             }`}
           >
-            {t.label}
+            {tr(tg.labelKey)}
           </button>
         ))}
       </div>
@@ -117,8 +119,8 @@ export default function StringEscape() {
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-2">
         <Panel className="min-h-0">
           <PanelHeader
-            title="Entrée"
-            subtitle={direction === 'escape' ? 'Texte brut' : 'Texte échappé'}
+            title={tr('common.input')}
+            subtitle={direction === 'escape' ? tr('ui.se.rawText') : tr('ui.se.escapedText')}
             right={<PasteButton onPaste={setInput} />}
           />
           <Textarea
@@ -128,9 +130,9 @@ export default function StringEscape() {
           />
         </Panel>
         <Panel className="min-h-0">
-          <PanelHeader title="Résultat" right={<CopyButton value={result.output} />} />
+          <PanelHeader title={tr('common.result')} right={<CopyButton value={result.output} />} />
           {result.error ? (
-            <div className="p-4 text-xs text-destructive">Erreur : {result.error}</div>
+            <div className="p-4 text-xs text-destructive">{tr('common.error')} : {result.error}</div>
           ) : (
             <pre className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap break-all bg-muted/[0.08] p-4 font-mono text-sm text-foreground">
               {result.output || '—'}

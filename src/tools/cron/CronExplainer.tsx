@@ -6,15 +6,16 @@ import ToolShell from '@/components/tool/ToolShell';
 import { Panel, PanelHeader } from '@/components/tool/Panel';
 import { usePersistentState } from '@/hooks/usePersistentState';
 import { getTool } from '@/tools';
+import { useI18n } from '@/i18n';
 import { CalendarClock } from 'lucide-react';
 
-const PRESETS: { expr: string; label: string }[] = [
-  { expr: '*/5 * * * *', label: 'Toutes les 5 min' },
-  { expr: '0 * * * *', label: 'Toutes les heures' },
-  { expr: '0 9 * * 1-5', label: 'En semaine à 9h' },
-  { expr: '0 0 * * 0', label: 'Dimanche minuit' },
-  { expr: '0 0 1 * *', label: 'Le 1er du mois' },
-  { expr: '30 3 * * *', label: 'Chaque jour à 3h30' },
+const PRESETS: { expr: string; labelKey: string }[] = [
+  { expr: '*/5 * * * *', labelKey: 'ui.cron.preset.5min' },
+  { expr: '0 * * * *', labelKey: 'ui.cron.preset.hourly' },
+  { expr: '0 9 * * 1-5', labelKey: 'ui.cron.preset.weekday9' },
+  { expr: '0 0 * * 0', labelKey: 'ui.cron.preset.sundayMidnight' },
+  { expr: '0 0 1 * *', labelKey: 'ui.cron.preset.firstOfMonth' },
+  { expr: '30 3 * * *', labelKey: 'ui.cron.preset.daily330' },
 ];
 
 // Développe un champ cron ("*", "*/n", "a-b", "a,b", "a-b/n") en liste de valeurs.
@@ -42,7 +43,7 @@ function expandField(field: string, min: number, max: number): number[] {
 
 function nextRuns(expr: string, count: number): Date[] {
   const parts = expr.trim().split(/\s+/);
-  if (parts.length !== 5) throw new Error('Attendu 5 champs : minute heure jour mois jour-semaine');
+  if (parts.length !== 5) throw new Error('CRON_NEED_5');
   const [mins, hours, doms, months, dows] = [
     expandField(parts[0], 0, 59),
     expandField(parts[1], 0, 23),
@@ -76,28 +77,30 @@ function nextRuns(expr: string, count: number): Date[] {
 
 export default function CronExplainer() {
   const tool = getTool('cron')!;
+  const { t, locale } = useI18n();
   const [expr, setExpr] = usePersistentState('cron:expr', '*/15 9-17 * * 1-5');
 
   const human = useMemo(() => {
     try {
-      return { text: cronstrue.toString(expr, { locale: 'fr', use24HourTimeFormat: true }), error: null as string | null };
+      return { text: cronstrue.toString(expr, { locale, use24HourTimeFormat: true }), error: null as string | null };
     } catch (e) {
       return { text: '', error: String(e) };
     }
-  }, [expr]);
+  }, [expr, locale]);
 
   const runs = useMemo(() => {
     try {
       return { list: nextRuns(expr, 7), error: null as string | null };
     } catch (e) {
-      return { list: [] as Date[], error: (e as Error).message };
+      const msg = (e as Error).message;
+      return { list: [] as Date[], error: msg === 'CRON_NEED_5' ? t('ui.cron.need5') : msg };
     }
-  }, [expr]);
+  }, [expr, t]);
 
   return (
     <ToolShell tool={tool}>
       <div className="flex flex-col gap-2">
-        <label className="text-xs font-medium">Expression cron (5 champs)</label>
+        <label className="text-xs font-medium">{t('ui.cron.exprLabel')}</label>
         <Input
           value={expr}
           onChange={(e) => setExpr(e.target.value)}
@@ -111,7 +114,7 @@ export default function CronExplainer() {
               onClick={() => setExpr(p.expr)}
               className="rounded-md border border-border px-2 py-1 text-[11px] text-muted-foreground hover:border-primary/30 hover:text-foreground"
             >
-              {p.label}
+              {t(p.labelKey)}
             </button>
           ))}
         </div>
@@ -123,9 +126,9 @@ export default function CronExplainer() {
             <CalendarClock className="h-4 w-4" />
           </div>
           <div className="min-w-0">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Signification</p>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t('ui.cron.meaning')}</p>
             {human.error ? (
-              <p className="mt-1 text-sm text-destructive">Expression invalide</p>
+              <p className="mt-1 text-sm text-destructive">{t('ui.cron.invalidExpr')}</p>
             ) : (
               <p className="mt-1 text-base font-medium text-foreground">{human.text}</p>
             )}
@@ -134,19 +137,19 @@ export default function CronExplainer() {
       </Panel>
 
       <Panel className="min-h-0 flex-1">
-        <PanelHeader title="Prochaines exécutions" subtitle="Sur la base de l'heure locale" />
+        <PanelHeader title={t('ui.cron.nextRuns')} subtitle={t('ui.cron.nextRunsSub')} />
         <div className="min-h-0 flex-1 overflow-auto">
           {runs.error ? (
             <p className="p-4 text-xs text-destructive">{runs.error}</p>
           ) : runs.list.length === 0 ? (
-            <p className="p-4 text-xs text-muted-foreground">Aucune exécution dans l'année à venir.</p>
+            <p className="p-4 text-xs text-muted-foreground">{t('ui.cron.none')}</p>
           ) : (
             <ul className="divide-y divide-border">
               {runs.list.map((d, i) => (
                 <li key={i} className="flex items-center justify-between px-4 py-2.5 font-mono text-xs">
-                  <span className="text-foreground">{d.toLocaleString('fr-FR', { weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                  <span className="text-foreground">{d.toLocaleString(locale, { weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
                   <span className="text-muted-foreground">
-                    {i === 0 ? 'prochaine' : `+${Math.round((d.getTime() - runs.list[0].getTime()) / 60000)} min`}
+                    {i === 0 ? t('ui.cron.next') : t('ui.cron.plusMin', { n: Math.round((d.getTime() - runs.list[0].getTime()) / 60000) })}
                   </span>
                 </li>
               ))}

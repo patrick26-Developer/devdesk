@@ -143,6 +143,19 @@ Il fait le travail mécanique de lecture et de rédaction, il ne décide pas à 
 - **67c9db1** Barre de titre intégrée (frameless) : `titleBarOverlay` (Windows) /
   `hiddenInset` (macOS), zones de déplacement, couleur des contrôles suit le thème.
 
+### Langues EN/FR — 2026-09-01
+
+- **d16806e** Infrastructure i18n légère (`src/i18n/` : `I18nProvider`, `useI18n`, `useT`) :
+  dictionnaires plats à clés en notation pointée, interpolation `{var}`, persistance
+  `localStorage` (`devdesk-locale`), détection initiale `navigator.language`, `<html lang>`
+  synchronisé. Dictionnaires FR (source) + EN : chrome (sidebar, en-tête, palette, boutons),
+  4 pages, 27 outils (desc + guide), API Client (~90 clés). Sélecteur de langue dans
+  Paramètres → Apparence.
+- **31c98c7** puis lots suivants : corps des composants des 27 outils passés par `useT()`
+  (`src/i18n/ui.fr.ts` / `ui.en.ts`, ~230 clés + libellés communs partagés). Détails de
+  détection (`detect.*`), locales dynamiques pour `Intl.RelativeTimeFormat`,
+  `cronstrue`, `toLocaleString`.
+
 ### API Client — 2026-08-31 (suite)
 
 - Transformation de l'outil « API Tester » en **API Client** complet

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n';
 
 interface InlineEditProps {
   value: string;
@@ -20,6 +21,7 @@ export default function InlineEdit({
   inputClassName,
   autoEdit = false,
 }: InlineEditProps) {
+  const t = useT();
   const [editing, setEditing] = useState(autoEdit);
   const [draft, setDraft] = useState(value);
   const ref = useRef<HTMLInputElement>(null);
@@ -65,7 +67,7 @@ export default function InlineEdit({
         e.stopPropagation();
         setEditing(true);
       }}
-      title="Double-cliquer pour renommer"
+      title={t('ui.inline.rename')}
       className={cn('cursor-text truncate', className)}
     >
       {value || <span className="text-muted-foreground">{placeholder}</span>}

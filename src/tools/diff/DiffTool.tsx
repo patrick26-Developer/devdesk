@@ -4,6 +4,7 @@ import ToolShell from '@/components/tool/ToolShell';
 import { Panel, PanelHeader } from '@/components/tool/Panel';
 import { usePersistentState } from '@/hooks/usePersistentState';
 import { getTool } from '@/tools';
+import { useT } from '@/i18n';
 
 type Row =
   | { type: 'equal'; left: number; right: number; text: string }
@@ -45,6 +46,7 @@ function diffLines(a: string[], b: string[]): Row[] {
 
 export default function DiffTool() {
   const tool = getTool('diff')!;
+  const t = useT();
   const [left, setLeft] = usePersistentState('diff:left', '');
   const [right, setRight] = usePersistentState('diff:right', '');
 
@@ -62,27 +64,27 @@ export default function DiffTool() {
     <ToolShell tool={tool}>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium">Version d'origine</label>
+          <label className="text-xs font-medium">{t('ui.diff.origin')}</label>
           <Textarea
             value={left}
             onChange={(e) => setLeft(e.target.value)}
-            placeholder="Collez le texte d'origine..."
+            placeholder={t('ui.diff.originPlaceholder')}
             className="min-h-[140px] resize-none font-mono text-xs leading-5"
           />
         </div>
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium">Version modifiée</label>
+          <label className="text-xs font-medium">{t('ui.diff.modified')}</label>
           <Textarea
             value={right}
             onChange={(e) => setRight(e.target.value)}
-            placeholder="Collez le texte modifié..."
+            placeholder={t('ui.diff.modifiedPlaceholder')}
             className="min-h-[140px] resize-none font-mono text-xs leading-5"
           />
         </div>
       </div>
 
       <Panel className="min-h-0 flex-1">
-        <PanelHeader title="Différences" subtitle="Comparaison ligne à ligne">
+        <PanelHeader title={t('ui.diff.title')} subtitle={t('ui.diff.subtitle')}>
           <div className="flex items-center gap-3 text-[11px] font-medium tabular-nums">
             <span className="text-emerald-500">+{added}</span>
             <span className="text-destructive">−{removed}</span>
@@ -90,7 +92,7 @@ export default function DiffTool() {
         </PanelHeader>
         <div className="min-h-0 flex-1 overflow-auto font-mono text-xs leading-5">
           {rows.length === 0 ? (
-            <p className="p-4 text-muted-foreground">Saisissez les deux versions pour voir les différences.</p>
+            <p className="p-4 text-muted-foreground">{t('ui.diff.empty')}</p>
           ) : (
             rows.map((row, idx) => (
               <div

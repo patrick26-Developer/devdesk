@@ -6,6 +6,7 @@ import { Panel, PanelHeader } from '@/components/tool/Panel';
 import CopyButton from '@/components/CopyButton';
 import { usePersistentState } from '@/hooks/usePersistentState';
 import { getTool } from '@/tools';
+import { useT } from '@/i18n';
 import { ArrowLeftRight } from 'lucide-react';
 
 function dotenvToObject(text: string): Record<string, string> {
@@ -37,6 +38,7 @@ function objectToDotenv(obj: Record<string, unknown>): string {
 
 export default function DotenvJson() {
   const tool = getTool('dotenv-json')!;
+  const t = useT();
   const [mode, setMode] = usePersistentState<'env2json' | 'json2env'>('dotenv-json:mode', 'env2json');
   const [input, setInput] = usePersistentState(
     'dotenv-json:input',
@@ -75,7 +77,7 @@ export default function DotenvJson() {
     >
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-2">
         <Panel className="min-h-0">
-          <PanelHeader title={mode === 'env2json' ? '.env' : 'JSON'} subtitle="Entrée" />
+          <PanelHeader title={mode === 'env2json' ? '.env' : 'JSON'} subtitle={t('common.input')} />
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -86,14 +88,14 @@ export default function DotenvJson() {
         <Panel className="min-h-0">
           <PanelHeader
             title={mode === 'env2json' ? 'JSON' : '.env'}
-            subtitle="Résultat"
+            subtitle={t('common.result')}
             right={<CopyButton value={result.output} />}
           />
           {result.error ? (
-            <div className="p-4 text-xs text-destructive">Erreur : {result.error}</div>
+            <div className="p-4 text-xs text-destructive">{t('common.error')} : {result.error}</div>
           ) : (
             <pre className="min-h-0 flex-1 overflow-auto bg-muted/[0.08] p-4 font-mono text-[13px] leading-6 text-foreground">
-              {result.output || '// En attente…'}
+              {result.output || t('ui.conv.waiting')}
             </pre>
           )}
         </Panel>

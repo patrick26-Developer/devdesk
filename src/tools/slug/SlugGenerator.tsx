@@ -5,6 +5,7 @@ import { Panel, PanelHeader } from '@/components/tool/Panel';
 import CopyButton from '@/components/CopyButton';
 import { usePersistentState } from '@/hooks/usePersistentState';
 import { getTool } from '@/tools';
+import { useT } from '@/i18n';
 
 interface Opts {
   separator: '-' | '_' | '.';
@@ -32,6 +33,7 @@ function slugify(text: string, o: Opts): string {
 
 export default function SlugGenerator() {
   const tool = getTool('slug')!;
+  const t = useT();
   const [input, setInput] = usePersistentState('slug:input', "Créer un article : « 10 Astuces pour l'Été 2026 »");
   const [opts, setOpts] = usePersistentState<Opts>('slug:opts', {
     separator: '-',
@@ -52,7 +54,7 @@ export default function SlugGenerator() {
   return (
     <ToolShell tool={tool}>
       <div className="flex flex-col gap-2">
-        <label className="text-xs font-medium">Texte (une ligne = un slug)</label>
+        <label className="text-xs font-medium">{t('ui.slug.label')}</label>
         <Textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -62,7 +64,7 @@ export default function SlugGenerator() {
 
       <div className="flex flex-wrap items-center gap-4 rounded-lg border border-border bg-card p-3 text-xs">
         <div className="flex items-center gap-1.5">
-          <span className="text-muted-foreground">Séparateur</span>
+          <span className="text-muted-foreground">{t('ui.slug.separator')}</span>
           {(['-', '_', '.'] as const).map((s) => (
             <button
               key={s}
@@ -75,14 +77,14 @@ export default function SlugGenerator() {
         </div>
         <label className="flex items-center gap-1.5">
           <input type="checkbox" checked={opts.lower} onChange={(e) => setOpts({ ...opts, lower: e.target.checked })} className="accent-primary" />
-          minuscules
+          {t('ui.slug.lower')}
         </label>
         <label className="flex items-center gap-1.5">
           <input type="checkbox" checked={opts.strict} onChange={(e) => setOpts({ ...opts, strict: e.target.checked })} className="accent-primary" />
-          strict (a-z 0-9)
+          {t('ui.slug.strict')}
         </label>
         <label className="flex items-center gap-1.5">
-          <span className="text-muted-foreground">Longueur max</span>
+          <span className="text-muted-foreground">{t('ui.slug.maxLength')}</span>
           <input
             type="number"
             min={0}
@@ -96,9 +98,9 @@ export default function SlugGenerator() {
 
       <Panel className="min-h-0 flex-1">
         <PanelHeader
-          title="Slugs"
-          subtitle={`${lines.length} ligne${lines.length > 1 ? 's' : ''}`}
-          right={lines.length > 0 ? <CopyButton value={lines.map((l) => l.slug).join('\n')} label="Tout copier" /> : undefined}
+          title={t('ui.slug.title')}
+          subtitle={t(lines.length > 1 ? 'common.lines' : 'common.line', { n: lines.length })}
+          right={lines.length > 0 ? <CopyButton value={lines.map((l) => l.slug).join('\n')} label={t('common.copyAll')} /> : undefined}
         />
         <div className="min-h-0 flex-1 divide-y divide-border overflow-auto">
           {lines.map((l, i) => (
