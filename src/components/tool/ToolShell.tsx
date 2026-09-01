@@ -8,6 +8,8 @@ import type { ReactNode } from 'react';
 import type { Tool } from '@/tools';
 import { getToolChip } from '@/tools';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n';
+import { toolDescKey } from '@/pages/toolText';
 
 interface ToolShellProps {
   tool: Tool;
@@ -28,6 +30,9 @@ export default function ToolShell({
   scroll = false,
 }: ToolShellProps) {
   const Icon = tool.icon;
+  const t = useT();
+  const descKey = toolDescKey(tool.id);
+  const description = t(descKey) === descKey ? tool.description : t(descKey);
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-background">
@@ -47,7 +52,7 @@ export default function ToolShell({
               {tool.name}
             </h2>
             <p className="mt-0.5 truncate text-xs text-muted-foreground">
-              {tool.description}
+              {description}
             </p>
           </div>
         </div>
