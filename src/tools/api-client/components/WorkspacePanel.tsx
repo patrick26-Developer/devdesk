@@ -40,8 +40,16 @@ export default function WorkspacePanel({ onOpenHistory, onManageCollection }: Wo
   const state = useApiClient();
   const [view, setView] = useState<'collections' | 'history'>('collections');
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  // id de la requête tout juste créée : son nom s'ouvre directement en édition.
+  const [justCreatedId, setJustCreatedId] = useState<string | null>(null);
 
   const toggle = (id: string) => setExpanded((e) => ({ ...e, [id]: !e[id] }));
+
+  const createRequest = (collectionId: string, parentFolderId: string | null) => {
+    const id = actions.newRequestIn(collectionId, parentFolderId);
+    setJustCreatedId(id);
+    setExpanded((e) => ({ ...e, [collectionId]: true, ...(parentFolderId ? { [parentFolderId]: true } : {}) }));
+  };
 
   return (
     <div className="flex h-full min-h-0 w-64 shrink-0 flex-col border-r border-border bg-card/30">
@@ -96,10 +104,7 @@ export default function WorkspacePanel({ onOpenHistory, onManageCollection }: Wo
                   />
                   <span className="shrink-0 text-[10px] text-muted-foreground/60 tabular-nums">{reqCount}</span>
                   <button
-                    onClick={() => {
-                      actions.newRequestIn(col.id, null);
-                      setExpanded((e) => ({ ...e, [col.id]: true }));
-                    }}
+                    onClick={() => createRequest(col.id, null)}
                     className="shrink-0 opacity-0 group-hover:opacity-100"
                     title={t('api.newRequestTitle')}
                   >
@@ -135,6 +140,8 @@ export default function WorkspacePanel({ onOpenHistory, onManageCollection }: Wo
                       expanded={expanded}
                       onToggle={toggle}
                       onExpand={(id) => setExpanded((e) => ({ ...e, [id]: true }))}
+                      justCreatedId={justCreatedId}
+                      onCreateRequest={createRequest}
                       depth={0}
                     />
                   </div>
@@ -189,6 +196,8 @@ function Tree({
   expanded,
   onToggle,
   onExpand,
+  justCreatedId,
+  onCreateRequest,
   depth,
 }: {
   items: CollectionItem[];
@@ -197,6 +206,8 @@ function Tree({
   expanded: Record<string, boolean>;
   onToggle: (id: string) => void;
   onExpand: (id: string) => void;
+  justCreatedId: string | null;
+  onCreateRequest: (collectionId: string, parentFolderId: string | null) => void;
   depth: number;
 }) {
   const t = useT();
@@ -218,10 +229,7 @@ function Tree({
                 {countRequests(it.items)}
               </span>
               <button
-                onClick={() => {
-                  actions.newRequestIn(collectionId, it.id);
-                  onExpand(it.id);
-                }}
+                onClick={() => onCreateRequest(collectionId, it.id)}
                 className="shrink-0 opacity-0 group-hover:opacity-100"
                 title={t('api.newRequestInFolder')}
               >
@@ -254,6 +262,8 @@ function Tree({
                   expanded={expanded}
                   onToggle={onToggle}
                   onExpand={onExpand}
+                  justCreatedId={justCreatedId}
+                  onCreateRequest={onCreateRequest}
                   depth={depth + 1}
                 />
               </div>
@@ -274,6 +284,7 @@ function Tree({
               value={it.request.name}
               placeholder={t("api.request")}
               className="min-w-0 flex-1 text-xs"
+              autoEdit={it.id === justCreatedId}
               onCommit={(name) => actions.renameItem(it.id, name)}
             />
             <button

@@ -9,7 +9,7 @@ import type {
   RequestDef,
   Variable,
 } from './types';
-import { defaultState, newId } from './types';
+import { defaultState, emptyRequest, newId } from './types';
 
 let state: ApiClientState = defaultState();
 let loaded = false;
