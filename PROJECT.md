@@ -143,6 +143,13 @@ Il fait le travail mécanique de lecture et de rédaction, il ne décide pas à 
 - **67c9db1** Barre de titre intégrée (frameless) : `titleBarOverlay` (Windows) /
   `hiddenInset` (macOS), zones de déplacement, couleur des contrôles suit le thème.
 
+### Corrections — 2026-09-01
+
+- **6a6dba6** `store.ts` : `emptyRequest()` utilisé dans `newDraft()` / `newRequestIn()`
+  sans import → `ReferenceError` silencieuse, le bouton « + fichier » ne créait rien.
+  Import ajouté. La requête créée s'ouvre directement en édition du nom (`InlineEdit`
+  `autoEdit`, `justCreatedId` suivi par `WorkspacePanel`).
+
 ### Langues EN/FR — 2026-09-01
 
 - **d16806e** Infrastructure i18n légère (`src/i18n/` : `I18nProvider`, `useI18n`, `useT`) :
