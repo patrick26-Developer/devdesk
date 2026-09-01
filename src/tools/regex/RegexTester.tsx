@@ -5,10 +5,12 @@ import { Textarea } from '@/components/ui/textarea';
 import ToolShell from '@/components/tool/ToolShell';
 import { Panel, PanelHeader } from '@/components/tool/Panel';
 import { getTool } from '@/tools';
+import { useT } from '@/i18n';
 import { SearchCheck } from 'lucide-react';
 
 export default function RegexTester() {
   const tool = getTool('regex')!;
+  const t = useT();
   const [pattern, setPattern] = usePersistentState('regex:pattern', '');
   const [flags, setFlags] = usePersistentState('regex:flags', 'g');
   const [text, setText] = usePersistentState('regex:text', '');
@@ -50,13 +52,13 @@ export default function RegexTester() {
     <ToolShell tool={tool}>
       <Panel>
         <div className="p-4">
-          <label className="mb-2 block text-xs font-medium">Expression régulière</label>
+          <label className="mb-2 block text-xs font-medium">{t('ui.regex.pattern')}</label>
           <div className="flex items-center gap-2 font-mono">
             <span className="text-muted-foreground">/</span>
             <Input
               value={pattern}
               onChange={(e) => setPattern(e.target.value)}
-              placeholder="votre pattern regex"
+              placeholder={t('ui.regex.patternPlaceholder')}
               className="font-mono"
             />
             <span className="text-muted-foreground">/</span>
@@ -65,7 +67,7 @@ export default function RegexTester() {
               onChange={(e) => setFlags(e.target.value)}
               placeholder="gim"
               className="w-20 font-mono"
-              aria-label="Flags de l'expression régulière"
+              aria-label={t('ui.regex.flagsLabel')}
             />
           </div>
         </div>
@@ -73,16 +75,16 @@ export default function RegexTester() {
 
       {result.error && (
         <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-3 text-xs text-destructive">
-          Erreur : {result.error}
+          {t('common.error')} : {result.error}
         </div>
       )}
 
       <div className="flex min-h-0 flex-1 flex-col gap-2">
-        <label className="text-xs font-medium">Texte à tester</label>
+        <label className="text-xs font-medium">{t('ui.regex.testText')}</label>
         <Textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Colle ton texte à tester ici..."
+          placeholder={t('ui.regex.testPlaceholder')}
           className="min-h-32 flex-1 resize-none font-mono text-sm"
         />
       </div>
@@ -91,10 +93,10 @@ export default function RegexTester() {
         <PanelHeader>
           <div className="flex items-center gap-2">
             <SearchCheck className="h-4 w-4 text-amber-500" />
-            <span className="text-xs font-semibold">Correspondances</span>
+            <span className="text-xs font-semibold">{t('ui.regex.matches')}</span>
           </div>
           <span className="text-xs text-muted-foreground tabular-nums">
-            {result.matches.length} résultat{result.matches.length !== 1 ? 's' : ''}
+            {t(result.matches.length === 1 ? 'ui.regex.resultCount' : 'ui.regex.resultCountPlural', { n: result.matches.length })}
           </span>
         </PanelHeader>
         <div className="min-h-24 whitespace-pre-wrap bg-muted/20 p-4 font-mono text-sm">

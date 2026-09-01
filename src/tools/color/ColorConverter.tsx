@@ -6,6 +6,7 @@ import ToolShell from '@/components/tool/ToolShell';
 import { Panel, PanelHeader } from '@/components/tool/Panel';
 import CopyButton from '@/components/CopyButton';
 import { getTool } from '@/tools';
+import { useT } from '@/i18n';
 import { RotateCcw } from 'lucide-react';
 
 function hexToRgb(hex: string) {
@@ -49,6 +50,7 @@ function rgbToHsl(r: number, g: number, b: number) {
 
 export default function ColorConverter() {
   const tool = getTool('color')!;
+  const t = useT();
   const [hex, setHex] = useState('#3b82f6');
 
   const isValidHex = /^#[0-9A-Fa-f]{6}$/.test(hex);
@@ -70,30 +72,28 @@ export default function ColorConverter() {
           className="gap-2 text-muted-foreground hover:text-foreground"
         >
           <RotateCcw className="h-3.5 w-3.5" />
-          Réinitialiser
+          {t('common.reset')}
         </Button>
       }
     >
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[280px_1fr]">
         <Panel>
-          <PanelHeader title="Aperçu" subtitle="Couleur sélectionnée" />
+          <PanelHeader title={t('common.preview')} subtitle={t('ui.color.previewSub')} />
           <div
             className="m-4 h-36 rounded-lg border border-border shadow-inner"
             style={{ backgroundColor: isValidHex ? hex : '#000000' }}
           />
           <div className="border-t border-border px-4 py-3">
             <p className="font-mono text-xs text-muted-foreground">
-              {isValidHex ? hex.toUpperCase() : 'HEX invalide'}
+              {isValidHex ? hex.toUpperCase() : t('ui.color.invalidHex')}
             </p>
           </div>
         </Panel>
 
         <Panel className="p-4">
           <div className="mb-4">
-            <p className="text-sm font-medium">Sélectionner une couleur</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Utilisez le sélecteur natif ou saisissez directement une valeur HEX.
-            </p>
+            <p className="text-sm font-medium">{t('ui.color.pick')}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t('ui.color.pickSub')}</p>
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -102,7 +102,7 @@ export default function ColorConverter() {
               value={isValidHex ? hex : '#000000'}
               onChange={(e) => setHex(e.target.value)}
               className="h-11 w-full cursor-pointer rounded-lg border border-border bg-background p-1 sm:w-20"
-              aria-label="Sélecteur de couleur"
+              aria-label={t('ui.color.pickerLabel')}
             />
             <div className="relative flex-1">
               <Input
@@ -110,7 +110,7 @@ export default function ColorConverter() {
                 onChange={(e) => setHex(e.target.value)}
                 placeholder="#3b82f6"
                 className="h-11 pr-16 font-mono text-sm"
-                aria-label="Valeur hexadécimale"
+                aria-label={t('ui.color.hexLabel')}
               />
               <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium text-muted-foreground">
                 HEX
@@ -120,8 +120,7 @@ export default function ColorConverter() {
 
           {!isValidHex && (
             <div className="mt-3 rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2 text-xs text-destructive">
-              Format invalide. Utilisez le format
-              <span className="ml-1 font-mono font-semibold">#rrggbb</span>.
+              {t('ui.color.badFormat')}
             </div>
           )}
         </Panel>

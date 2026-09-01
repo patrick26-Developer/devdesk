@@ -8,10 +8,12 @@ import ToolShell from '@/components/tool/ToolShell';
 import { Panel, PanelHeader } from '@/components/tool/Panel';
 import CopyButton from '@/components/CopyButton';
 import { getTool } from '@/tools';
+import { useT } from '@/i18n';
 import { Eye, FileCode2, ShieldCheck } from 'lucide-react';
 
 export default function MarkdownPreview() {
   const tool = getTool('markdown')!;
+  const t = useT();
   const [markdown, setMarkdown] = usePersistentState(
     'markdown:content',
     '# Titre\n\nTape du **Markdown** ici.'
@@ -26,25 +28,25 @@ export default function MarkdownPreview() {
     <ToolShell tool={tool}>
       <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
         <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
-        Aperçu nettoyé avec DOMPurify avant injection HTML.
+        {t('ui.md.sanitized')}
       </div>
 
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-2">
         <Panel className="min-h-0">
-          <PanelHeader icon={FileCode2} title="Markdown" subtitle="Éditeur" />
+          <PanelHeader icon={FileCode2} title="Markdown" subtitle={t('ui.md.editor')} />
           <Textarea
             value={markdown}
             onChange={(e) => setMarkdown(e.target.value)}
             className="min-h-0 flex-1 resize-none rounded-none border-0 bg-muted/10 p-4 font-mono text-sm leading-6 focus-visible:ring-0"
-            placeholder="# Votre titre..."
+            placeholder={t('ui.md.placeholder')}
           />
         </Panel>
 
         <Panel className="min-h-0">
           <PanelHeader
             icon={Eye}
-            title="Aperçu"
-            subtitle="Rendu en temps réel"
+            title={t('common.preview')}
+            subtitle={t('ui.md.previewSub')}
             right={<CopyButton value={safeHtml} label="HTML" />}
           />
           <div

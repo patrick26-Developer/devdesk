@@ -7,6 +7,7 @@ import EmptyState from '@/components/tool/EmptyState';
 import CopyButton from '@/components/CopyButton';
 import PasteButton from '@/components/PasteButton';
 import { getTool } from '@/tools';
+import { useT } from '@/i18n';
 import { AlertCircle, CheckCircle2, Code2, KeyRound, ShieldCheck } from 'lucide-react';
 
 function base64UrlDecode(str: string): string {
@@ -17,6 +18,7 @@ function base64UrlDecode(str: string): string {
 
 export default function JwtDecoder() {
   const tool = getTool('jwt')!;
+  const t = useT();
   const [token, setToken] = usePersistentState('jwt:token', '');
 
   const decoded = useMemo(() => {
@@ -24,7 +26,7 @@ export default function JwtDecoder() {
 
     const parts = token.trim().split('.');
     if (parts.length !== 3) {
-      return { error: 'Format invalide : un JWT doit contenir 3 parties séparées par des points' };
+      return { error: t('ui.jwt.badFormat') };
     }
 
     try {
@@ -33,23 +35,20 @@ export default function JwtDecoder() {
       const isExpired = payload.exp ? Date.now() / 1000 > payload.exp : null;
       return { header, payload, isExpired, error: null as string | null };
     } catch {
-      return { error: 'Impossible de décoder ce token (Base64 ou JSON invalide)' };
+      return { error: t('ui.jwt.badDecode') };
     }
-  }, [token]);
+  }, [token, t]);
 
   return (
     <ToolShell tool={tool}>
       <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-4 py-3 text-xs text-muted-foreground">
         <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-500" />
-        <span>
-          Décodage uniquement en local — aucune vérification de signature et aucune donnée envoyée à
-          un serveur.
-        </span>
+        <span>{t('ui.jwt.localOnly')}</span>
       </div>
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <label className="text-xs font-medium text-foreground">Token JWT</label>
+          <label className="text-xs font-medium text-foreground">{t('ui.jwt.label')}</label>
           <div className="flex items-center gap-2">
             <span className="font-mono text-[10px] text-muted-foreground">HEADER.PAYLOAD.SIGNATURE</span>
             <PasteButton onPaste={setToken} />
@@ -67,7 +66,7 @@ export default function JwtDecoder() {
         <div className="flex items-start gap-3 rounded-xl border border-destructive/20 bg-destructive/5 p-4">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
           <div>
-            <p className="text-xs font-semibold text-destructive">Token invalide</p>
+            <p className="text-xs font-semibold text-destructive">{t('ui.jwt.invalid')}</p>
             <p className="mt-1 text-xs leading-5 text-muted-foreground">{decoded.error}</p>
           </div>
         </div>
@@ -76,7 +75,7 @@ export default function JwtDecoder() {
       {decoded && !decoded.error && (
         <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-2">
           <Panel className="min-h-0">
-            <PanelHeader icon={Code2} title="Header" subtitle="Métadonnées du token"
+            <PanelHeader icon={Code2} title="Header" subtitle={t('ui.jwt.headerSub')}
               right={<CopyButton value={JSON.stringify(decoded.header, null, 2)} />} />
             <pre className="min-h-0 flex-1 overflow-auto bg-muted/20 p-4 font-mono text-xs leading-5">
               {JSON.stringify(decoded.header, null, 2)}
@@ -91,7 +90,7 @@ export default function JwtDecoder() {
                 </div>
                 <div>
                   <p className="text-sm font-medium">Payload</p>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground">Claims et données</p>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">{t('ui.jwt.payloadSub')}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -108,7 +107,7 @@ export default function JwtDecoder() {
                     ) : (
                       <CheckCircle2 className="h-3 w-3" />
                     )}
-                    {decoded.isExpired ? 'Token expiré' : 'Token non expiré'}
+                    {decoded.isExpired ? t('ui.jwt.expired') : t('ui.jwt.notExpired')}
                   </span>
                 )}
                 <CopyButton value={JSON.stringify(decoded.payload, null, 2)} />
@@ -125,8 +124,8 @@ export default function JwtDecoder() {
         <Panel className="min-h-0 flex-1 border-dashed bg-muted/10">
           <EmptyState
             icon={KeyRound}
-            title="Aucun token à analyser"
-            description="Collez un token JWT dans la zone ci-dessus pour afficher automatiquement son header et son payload."
+            title={t('ui.jwt.emptyTitle')}
+            description={t('ui.jwt.emptyDesc')}
           />
         </Panel>
       )}

@@ -14,9 +14,11 @@ import { Panel, PanelHeader, PanelFooter } from '@/components/tool/Panel';
 import CopyButton from '@/components/CopyButton';
 import PasteButton from '@/components/PasteButton';
 import { getTool } from '@/tools';
+import { useT } from '@/i18n';
 
 export default function Base64Tool() {
   const tool = getTool('base64')!;
+  const t = useT();
   const [input, setInput] = usePersistentState('base64:input', '');
   const [output, setOutput] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +38,7 @@ export default function Base64Tool() {
       setOutput(decodeURIComponent(escape(atob(input))));
       setError(null);
     } catch {
-      setError('Chaîne Base64 invalide');
+      setError(t('ui.base64.invalid'));
       setOutput('');
     }
   };
@@ -59,21 +61,21 @@ export default function Base64Tool() {
           className="gap-2 text-muted-foreground hover:text-foreground"
         >
           <RotateCcw className="h-3.5 w-3.5" />
-          Réinitialiser
+          {t('common.reset')}
         </Button>
       }
     >
       <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3.5 py-2.5 text-xs text-muted-foreground">
         <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-500" />
-        <span>Le traitement est effectué localement dans DevDesk.</span>
+        <span>{t('common.localProcessing')}</span>
       </div>
 
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-2">
         <Panel className="min-h-0">
           <PanelHeader
-            title="Entrée"
-            subtitle="Texte ou chaîne Base64"
-            right={<PasteButton onPaste={(t) => { setInput(t); setError(null); }} />}
+            title={t('common.input')}
+            subtitle={t('ui.base64.inputSub')}
+            right={<PasteButton onPaste={(v) => { setInput(v); setError(null); }} />}
           />
           <Textarea
             value={input}
@@ -81,52 +83,52 @@ export default function Base64Tool() {
               setInput(e.target.value);
               setError(null);
             }}
-            placeholder="Saisissez votre texte ou votre chaîne Base64..."
+            placeholder={t('ui.base64.placeholder')}
             className="min-h-[180px] flex-1 resize-none rounded-none border-0 bg-transparent p-4 font-mono text-sm shadow-none focus-visible:ring-0"
           />
           <PanelFooter>
-            <span>Entrée</span>
-            <span>{input.length} car.</span>
+            <span>{t('common.input')}</span>
+            <span>{t('common.characters', { n: input.length })}</span>
           </PanelFooter>
         </Panel>
 
         <Panel className="min-h-0">
           <PanelHeader
-            title="Résultat"
-            subtitle="Résultat de l'opération"
+            title={t('common.result')}
+            subtitle={t('ui.base64.resultSub')}
             right={<CopyButton value={output} />}
           />
           <Textarea
             value={output}
             readOnly
-            placeholder="Le résultat apparaîtra ici..."
+            placeholder={t('common.resultPlaceholder')}
             className="min-h-[180px] flex-1 resize-none rounded-none border-0 bg-muted/[0.18] p-4 font-mono text-sm shadow-none focus-visible:ring-0"
           />
           <PanelFooter>
-            <span>Résultat</span>
-            <span>{output.length} car.</span>
+            <span>{t('common.result')}</span>
+            <span>{t('common.characters', { n: output.length })}</span>
           </PanelFooter>
         </Panel>
       </div>
 
       {error && (
         <div className="rounded-lg border border-destructive/20 bg-destructive/5 px-4 py-2.5 text-xs text-destructive">
-          <span className="font-medium">Erreur :</span> {error}
+          <span className="font-medium">{t('common.error')} :</span> {error}
         </div>
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
         <p className="text-[11px] text-muted-foreground">
-          Choisissez une opération pour transformer votre contenu.
+          {t('ui.base64.hint')}
         </p>
         <div className="flex gap-2">
           <Button onClick={encode} disabled={!input} className="gap-2">
             <ArrowUpFromLine className="h-4 w-4" />
-            Encoder
+            {t('common.encode')}
           </Button>
           <Button variant="secondary" onClick={decode} disabled={!input} className="gap-2">
             <ArrowDownToLine className="h-4 w-4" />
-            Décoder
+            {t('common.decode')}
           </Button>
         </div>
       </div>

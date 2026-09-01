@@ -5,10 +5,12 @@ import ToolShell from '@/components/tool/ToolShell';
 import { Panel } from '@/components/tool/Panel';
 import CopyButton from '@/components/CopyButton';
 import { getTool } from '@/tools';
+import { useI18n } from '@/i18n';
 import { ArrowDown, ArrowUp, Clock } from 'lucide-react';
 
 export default function TimestampConverter() {
   const tool = getTool('timestamp')!;
+  const { t, locale } = useI18n();
   const [timestampInput, setTimestampInput] = useState('');
   const [dateInput, setDateInput] = useState('');
 
@@ -24,9 +26,9 @@ export default function TimestampConverter() {
       iso: date.toISOString(),
       local: date.toLocaleString(),
       utc: date.toUTCString(),
-      relative: formatRelative(date),
+      relative: formatRelative(date, locale),
     };
-  }, [timestampInput]);
+  }, [timestampInput, locale]);
 
   const fromDate = useMemo(() => {
     if (!dateInput) return null;
@@ -45,8 +47,8 @@ export default function TimestampConverter() {
             <div className="mb-4 flex items-center gap-2">
               <ArrowDown className="h-4 w-4 text-emerald-500" />
               <div>
-                <p className="text-xs font-semibold">Timestamp → Date</p>
-                <p className="text-[11px] text-muted-foreground">Secondes ou millisecondes</p>
+                <p className="text-xs font-semibold">{t('ui.ts.toDate')}</p>
+                <p className="text-[11px] text-muted-foreground">{t('ui.ts.toDateSub')}</p>
               </div>
             </div>
 
@@ -59,16 +61,16 @@ export default function TimestampConverter() {
               />
               <Button variant="secondary" onClick={useNow} className="gap-2">
                 <Clock className="h-3.5 w-3.5" />
-                Maintenant
+                {t('ui.ts.now')}
               </Button>
             </div>
 
             {fromTimestamp && (
               <div className="mt-4 space-y-2 rounded-lg bg-muted/30 p-3 font-mono text-xs">
                 <Row label="ISO" value={fromTimestamp.iso} />
-                <Row label="Local" value={fromTimestamp.local} />
+                <Row label={t('ui.ts.local')} value={fromTimestamp.local} />
                 <Row label="UTC" value={fromTimestamp.utc} />
-                <Row label="Relatif" value={fromTimestamp.relative} />
+                <Row label={t('ui.ts.relative')} value={fromTimestamp.relative} />
               </div>
             )}
           </div>
@@ -79,8 +81,8 @@ export default function TimestampConverter() {
             <div className="mb-4 flex items-center gap-2">
               <ArrowUp className="h-4 w-4 text-emerald-500" />
               <div>
-                <p className="text-xs font-semibold">Date → Timestamp</p>
-                <p className="text-[11px] text-muted-foreground">Date et heure locales</p>
+                <p className="text-xs font-semibold">{t('ui.ts.toTs')}</p>
+                <p className="text-[11px] text-muted-foreground">{t('ui.ts.toTsSub')}</p>
               </div>
             </div>
 
@@ -89,13 +91,13 @@ export default function TimestampConverter() {
               value={dateInput}
               onChange={(e) => setDateInput(e.target.value)}
               className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
-              aria-label="Date et heure"
+              aria-label={t('ui.ts.dateTimeLabel')}
             />
 
             {fromDate !== null && (
               <div className="mt-4 flex items-center justify-between gap-3 rounded-lg bg-muted/30 p-3">
                 <div className="min-w-0">
-                  <p className="text-xs text-muted-foreground">Timestamp Unix</p>
+                  <p className="text-xs text-muted-foreground">{t('ui.ts.unix')}</p>
                   <p className="mt-1 font-mono text-sm font-medium">{fromDate}</p>
                 </div>
                 <CopyButton value={String(fromDate)} />
@@ -119,7 +121,7 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
-function formatRelative(date: Date): string {
+function formatRelative(date: Date, locale: string): string {
   const diffMs = date.getTime() - Date.now();
   const abs = Math.abs(diffMs);
   const units: [Intl.RelativeTimeFormatUnit, number][] = [
@@ -130,7 +132,7 @@ function formatRelative(date: Date): string {
     ['minute', 60000],
     ['second', 1000],
   ];
-  const rtf = new Intl.RelativeTimeFormat('fr', { numeric: 'auto' });
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
   for (const [unit, ms] of units) {
     if (abs >= ms || unit === 'second') {
       return rtf.format(Math.round(diffMs / ms), unit);

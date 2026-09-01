@@ -6,11 +6,13 @@ import { toolsFr } from './tools.fr';
 import { toolsEn } from './tools.en';
 import { apiFr } from './api.fr';
 import { apiEn } from './api.en';
+import { uiFr } from './ui.fr';
+import { uiEn } from './ui.en';
 
 export type Locale = 'fr' | 'en';
 
-const mergedFr = { ...fr, ...toolsFr, ...apiFr };
-const mergedEn = { ...en, ...toolsEn, ...apiEn };
+const mergedFr = { ...fr, ...toolsFr, ...apiFr, ...uiFr };
+const mergedEn = { ...en, ...toolsEn, ...apiEn, ...uiEn };
 
 const DICTS: Record<Locale, Record<string, string>> = { fr: mergedFr, en: mergedEn };
 const STORAGE_KEY = 'devdesk-locale';
